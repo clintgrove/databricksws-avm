@@ -1,5 +1,5 @@
 module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
-  name: '${uniqueString(deployment().name, resourceLocation)}-test-dwmin'
+  name: 'clintdbr-test-dwmin'
   params: {
     // Required parameters
     name: 'dwmin001'
