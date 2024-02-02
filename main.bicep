@@ -1,4 +1,4 @@
-module workspace 'br:Azure/bicep-registry-modules/avm/res/databricks/workspace:v1'
+module workspace 'br/public:avm/res/databricks/workspace:1.0.0.0'
   name: '${uniqueString(deployment().name, resourceLocation)}-test-dwmin'
   params: {
     // Required parameters
