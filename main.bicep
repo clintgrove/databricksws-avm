@@ -1,4 +1,4 @@
-module workspace 'br/public:avm/res/databricks/workspace:0.1' = {
+module workspace 'br/public:avm/res/databricks/workspace' = {
   name: '${uniqueString(deployment().name, resourceLocation)}-test-dwmin'
   params: {
     // Required parameters
