@@ -4,7 +4,6 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     name: 'dwwaf002'
     customPrivateSubnetName: 'clintdbr-subnet-private'
     customPublicSubnetName: 'clintdbr-subnet-public'
-    customVirtualNetworkResourceId: '<customVirtualNetworkResourceId>'
     disablePublicIp: true
     location: 'uksouth'
     natGatewayName: 'nat-gateway'
