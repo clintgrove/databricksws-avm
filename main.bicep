@@ -1,5 +1,5 @@
 module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
-  name: '${uniqueString(deployment().name, 'uksouth'}-test-dwwaf'
+  name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf'
   params: {
     name: 'dwwaf002'
     customPrivateSubnetName: 'clintdbr-subnet-private'
@@ -15,11 +15,6 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     skuName: 'premium'
     storageAccountName: 'sadwwaf001'
     storageAccountSkuName: 'Standard_ZRS'
-    tags: {
-      Environment: 'Non-Prod'
-      'hidden-title': 'This is visible in the resource name'
-      Role: 'DeploymentValidation'
-    }
-    vnetAddressPrefix: '10.100'
+    vnetAddressPrefix: '10.100' 
   }
 }
