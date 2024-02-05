@@ -1,5 +1,7 @@
 name: Deploy Bicep file
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
