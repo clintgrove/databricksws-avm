@@ -3,6 +3,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   params: {
     // Required parameters
     adminUsername: 'localAdminUser'
+    encryptionAtHost: false
     imageReference: {
       offer: 'WindowsServer'
       publisher: 'MicrosoftWindowsServer'
