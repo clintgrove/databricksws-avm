@@ -11,7 +11,7 @@ param privateSubnetName string = 'private-subnet'
 @description('The name of the subnet to create the private endpoint in.')
 param PrivateEndpointSubnetName string = 'default'
 @description('CIDR range for the vnet.')
-param vnetCidr string = '10.179.0.0/16'
+param vnetCidr array = ['10.179.0.0/16']
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.0' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-nsg'
@@ -107,12 +107,12 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.0' = {
   }
 }
 
-module vnetwork 'br/public:avm/res/network/virtual-network:0.1.0' = {
+module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-vnet'
   params: {
     name: 'dwwaf-vnet'
     location: 'uksouth'
-    addressPrefixes: [vnetCidr]
+    addressPrefixes: vnetCidr
     subnets: [
       {
         name: publicSubnetName
