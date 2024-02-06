@@ -1,7 +1,15 @@
 name: Deploy Bicep file
 on:
   workflow_dispatch:
+    inputs:
+      paramRG:
+        description: 'Parameter for resource group'
+        required: true
+        default: 'dbr-private-rg-1'
   push:
+    branches:
+      - main
+    
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
