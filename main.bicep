@@ -154,14 +154,14 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf'
   params: {
     name: 'dwwaf002'
-    customPrivateSubnetName: 'clintdbr-subnet-private'
-    customPublicSubnetName: 'clintdbr-subnet-public'
+    customPrivateSubnetName: vnetwork.outputs.subnetNames[1]
+    customPublicSubnetName: vnetwork.outputs.subnetNames[0]
     customVirtualNetworkResourceId: vnetwork.outputs.resourceId
     disablePublicIp: true
     location: 'uksouth'
-    natGatewayName: 'nat-gateway'
+    natGatewayName: nsg.outputs.name
     prepareEncryption: true
-    publicIpName: 'nat-gw-public-ip'
+    publicIpName: 'dwwaf002-ip'
     publicNetworkAccess: 'Disabled'
     requiredNsgRules: 'NoAzureDatabricksRules'
     requireInfrastructureEncryption: true
