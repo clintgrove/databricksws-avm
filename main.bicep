@@ -12,8 +12,15 @@ param privateSubnetName string = 'private-subnet'
 param PrivateEndpointSubnetName string = 'default'
 @description('CIDR range for the vnet.')
 param vnetCidr array = ['10.179.0.0/16']
+@description('The name of the workspace to create.')
+param workspaceName string = 'dwwaf002'
 
-module nsg 'br/public:avm/res/network/network-security-group:0.1.0' = {
+var privateDnsZoneName = 'privatelink.azuredatabricks.net'
+var privateEndpointName = '${workspaceName}-pvtEndpoint'
+var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
+var pvtEndpointDnsGroupNameBrowserAuth = '${privateEndpointNameBrowserAuth}/mydnsgroupname'
+
+module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-nsg'
   params: {
     name: 'dwwaf-nsg'
@@ -153,7 +160,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
 module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf'
   params: {
-    name: 'dwwaf002'
+    name: workspaceName
     customPrivateSubnetName: vnetwork.outputs.subnetNames[1]
     customPublicSubnetName: vnetwork.outputs.subnetNames[0]
     customVirtualNetworkResourceId: vnetwork.outputs.resourceId
@@ -168,5 +175,74 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     storageAccountName: 'sadwwaf001'
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: '10.179' 
+  }
+}
+
+module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
+  dependsOn: [
+    workspace
+    vnetwork
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-pe'
+  params: {
+    name: privateEndpointName
+    location: 'uksouth'
+    subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
+    privateDnsZoneGroupName: 'config1'
+    privateLinkServiceConnections: [
+      {
+        name: privateEndpointName
+        properties: {
+          groupIds: [
+            'databricks_ui_api'
+          ]
+          privateLinkServiceId: workspace.outputs.resourceId
+        }
+      }
+    ]
+  }
+}
+
+module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
+  dependsOn: [
+    privateEndpoint
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-pvdns-dwwaf'
+  params: {
+    name: privateDnsZoneName
+    location: 'global'
+    virtualNetworkLinks: [
+      {
+        registrationEnabled: true
+        virtualNetworkResourceId: vnetwork.outputs.resourceId 
+      }
+    ]
+  }
+}
+
+module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
+  dependsOn: [
+    privateEndpoint
+    vnetwork
+    workspace
+    privateDnsZone
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
+  params: {
+    name: privateEndpointNameBrowserAuth
+    location: 'uksouth'
+    subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
+    privateDnsZoneGroupName: pvtEndpointDnsGroupNameBrowserAuth
+    privateLinkServiceConnections: [
+      {
+        name: privateEndpointNameBrowserAuth
+        properties: {
+          groupIds: [
+            'browser_authentication'
+          ]
+          privateLinkServiceId: workspace.outputs.resourceId
+        }
+      }
+    ]
   }
 }
