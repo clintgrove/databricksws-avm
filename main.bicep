@@ -1,17 +1,17 @@
 @description('The name of the public subnet to create.')
 param publicSubnetName string = 'public-subnet'
 @description('CIDR range for the public subnet.')
-param publicSubnetCidr string = '10.179.64.0/18'
+param publicSubnetCidr string = '10.101.64.0/18'
 @description('CIDR range for the private subnet.')
-param privateSubnetCidr string = '10.179.0.0/18'
+param privateSubnetCidr string = '10.101.0.0/18'
 @description('CIDR range for the private endpoint subnet..')
-param privateEndpointSubnetCidr string = '10.179.128.0/24'
+param privateEndpointSubnetCidr string = '10.101.128.0/24'
 @description('The name of the private subnet to create.')
 param privateSubnetName string = 'private-subnet'
 @description('The name of the subnet to create the private endpoint in.')
 param PrivateEndpointSubnetName string = 'default'
 @description('CIDR range for the vnet.')
-param vnetCidr array = ['10.179.0.0/16']
+param vnetCidr array = ['10.101.0.0/16']
 @description('The name of the workspace to create.')
 param workspaceName string = 'dwwaf002'
 
@@ -174,7 +174,14 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     skuName: 'premium'
     storageAccountName: 'sadwwaf001'
     storageAccountSkuName: 'Standard_ZRS'
-    vnetAddressPrefix: '10.179' 
+    vnetAddressPrefix: '10.101' 
+    roleAssignments: [
+      {
+        principalId: 'aa736789-9da5-4b91-a8ba-8e9d142e6153' //adornglobal
+        principalType: 'User'
+        roleDefinitionIdOrName: 'Owner'
+      }
+    ]
   }
 }
 
