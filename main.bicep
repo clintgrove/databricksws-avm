@@ -116,12 +116,9 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
     subnets: [
       {
         name: publicSubnetName
-        properties: {
-          addressPrefix: publicSubnetCidr
-          networkSecurityGroup: {
-            id: nsg.outputs.resourceId
-          }
-          delegations: [
+        addressPrefix: publicSubnetCidr
+        networkSecurityGroupResourceId: nsg.outputs.resourceId
+        delegations: [
             {
               name: 'databricks-del-public'
               properties: {
@@ -129,16 +126,12 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
               }
             }
           ]
-        }
       }
       {
         name: privateSubnetName
-        properties: {
-          addressPrefix: privateSubnetCidr
-          networkSecurityGroup: {
-            id: nsg.outputs.resourceId
-          }
-          delegations: [
+        addressPrefix: privateSubnetCidr
+        networkSecurityGroupResourceId: nsg.outputs.resourceId
+        delegations: [
             {
               name: 'databricks-del-private'
               properties: {
@@ -146,14 +139,12 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
               }
             }
           ]
-        }
       }
       {
         name: PrivateEndpointSubnetName
-        properties: {
-          addressPrefix: privateEndpointSubnetCidr
-          privateEndpointNetworkPolicies: 'Disabled'
-        }
+        addressPrefix: privateEndpointSubnetCidr
+        privateEndpointNetworkPolicies: 'Disabled'
+
       }
     ]
   }
