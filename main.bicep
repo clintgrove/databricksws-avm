@@ -161,13 +161,12 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     location: 'uksouth'
     natGatewayName: nsg.outputs.name
     prepareEncryption: true
-    publicIpName: 'dwwaf002-ip'
     publicNetworkAccess: 'Disabled'
     requiredNsgRules: 'NoAzureDatabricksRules'
     requireInfrastructureEncryption: true
     skuName: 'premium'
     storageAccountName: 'sadwwaf001'
     storageAccountSkuName: 'Standard_ZRS'
-    vnetAddressPrefix: '10.100' 
+    vnetAddressPrefix: '10.179' 
   }
 }
