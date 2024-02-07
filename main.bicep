@@ -158,6 +158,10 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
 }
 
 module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
+  dependsOn: [
+    vnetwork
+    nsg
+  ]
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf'
   params: {
     name: workspaceName
@@ -189,6 +193,7 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   dependsOn: [
     workspace
     vnetwork
+    nsg
   ]
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-pe'
   params: {
