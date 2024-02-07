@@ -115,6 +115,9 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
 }
 
 module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
+  dependsOn: [
+    nsg
+  ]
   name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-vnet'
   params: {
     name: 'dwwaf-vnet'
