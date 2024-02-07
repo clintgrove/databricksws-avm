@@ -31,5 +31,6 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
     }
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
+    adminPassword: guid('adminPassword', 'secret')
   }
 }
