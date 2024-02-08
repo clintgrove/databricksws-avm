@@ -34,3 +34,11 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
     adminPassword: guid('adminPassword', 'secret')
   }
 }
+
+module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
+  name: '${uniqueString(deployment().name, 'uksouth')}-vmachine-nsg'
+  params: {
+    name: 'dwwaf-vms-nsg'
+    location: 'uksouth'
+  }
+}
