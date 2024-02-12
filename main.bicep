@@ -179,7 +179,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     requiredNsgRules: 'NoAzureDatabricksRules'
     requireInfrastructureEncryption: true
     skuName: 'premium'
-    storageAccountName: 'sadwwaf001'
+    storageAccountName: ${uniqueString(deployment().name, 'storage')}
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: '10.101' 
     roleAssignments: [
