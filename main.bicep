@@ -165,7 +165,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     vnetwork
     nsg
   ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf'
+  name: '${uniqueString(deployment().name, 'uksouth')}-databricksworkspace'
   params: {
     name: workspaceName
     customPrivateSubnetName: vnetwork.outputs.subnetNames[1]
@@ -214,7 +214,7 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
     vnetwork
     nsg
   ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-pe'
+  name: '${uniqueString(deployment().name, 'uksouth')}-dbr-privateendpoint'
   params: {
     name: privateEndpointName
     location: 'uksouth'
@@ -238,7 +238,7 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
   dependsOn: [
     privateEndpoint
   ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-pvdns-dwwaf'
+  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
   params: {
     name: privateDnsZoneName
     location: 'global'
