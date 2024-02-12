@@ -184,9 +184,9 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     vnetAddressPrefix: '10.101' 
     roleAssignments: [
       {
-        principalId: 'aa736789-9da5-4b91-a8ba-8e9d142e6153' //adornglobal
+        principalId: '5d39eec6-6d61-4be7-bc0d-f411a9e67d6a' //adornglobal
         principalType: 'User'
-        roleDefinitionIdOrName: 'Owner'
+        roleDefinitionIdOrName: 'Contributor'
       }
     ]
   }
