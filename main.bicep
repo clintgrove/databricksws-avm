@@ -197,6 +197,14 @@ module accessConnector 'br/public:avm/res/databricks/access-connector:0.1.0' = {
   params: {
     name: 'dacmin001'
     location: 'uksouth'
+    roleAssignments: [
+      {
+        principalId: '5d39eec6-6d61-4be7-bc0d-f411a9e67d6a' //adornglobal
+        principalType: 'User'
+        roleDefinitionIdOrName: 'Owner'
+      }
+    ]
+    
   }
 }
 
