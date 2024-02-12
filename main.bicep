@@ -192,21 +192,21 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
   }
 }
 
-module accessConnector 'br/public:avm/res/databricks/access-connector:0.1.0' = {
-  name: '${uniqueString(deployment().name, 'uksouth')}-dbraccessconnector'
-  params: {
-    name: 'dacmin001'
-    location: 'uksouth'
-    // roleAssignments: [
-    //   {
-    //     principalId: '5d39eec6-6d61-4be7-bc0d-f411a9e67d6a' //adornglobal
-    //     principalType: 'User'
-    //     roleDefinitionIdOrName: 'Owner'
-    //   }
-    // ]
+// module accessConnector 'br/public:avm/res/databricks/access-connector:0.1.0' = {
+//   name: '${uniqueString(deployment().name, 'uksouth')}-dbraccessconnector'
+//   params: {
+//     name: 'dacmin001'
+//     location: 'uksouth'
+//     roleAssignments: [
+//       {
+//         principalId: '5d39eec6-6d61-4be7-bc0d-f411a9e67d6a' //adornglobal
+//         principalType: 'User'
+//         roleDefinitionIdOrName: 'Owner'
+//       }
+//     ]
     
-  }
-}
+//   }
+// }
 
 module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   dependsOn: [
