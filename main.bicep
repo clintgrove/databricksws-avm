@@ -192,6 +192,14 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
   }
 }
 
+module accessConnector 'br/public:avm/res/databricks/access-connector:0.1.0' = {
+  name: '${uniqueString(deployment().name, 'uksouth')}-dbraccessconnector'
+  params: {
+    name: 'dacmin001'
+    location: 'uksouth'
+  }
+}
+
 module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   dependsOn: [
     workspace
