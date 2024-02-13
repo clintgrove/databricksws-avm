@@ -151,11 +151,11 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
             }
           ]
       }
-      {
-        name: 'AzureBastionSubnet'
-        addressPrefix: '10.101.129.0/26'
-        networkSecurityGroupResourceId: '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/networkSecurityGroups/dwwaf-vnet-AzureBastionSubnet-nsg-uksouth'
-      }
+      // {
+      //   name: 'AzureBastionSubnet'
+      //   addressPrefix: '10.101.129.0/26'
+      //   networkSecurityGroupResourceId: '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/networkSecurityGroups/dwwaf-vnet-AzureBastionSubnet-nsg-uksouth'
+      // }
       {
         name: PrivateEndpointSubnetName
         addressPrefix: privateEndpointSubnetCidr
