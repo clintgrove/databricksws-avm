@@ -35,13 +35,21 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   }
 }
 
-module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
-  name: '${uniqueString(deployment().name, 'uksouth')}-vmachine-nsg'
+module publicIpAddress 'br/public:avm/res/network/public-ip-address:0.2.2' = {
+  name: '${uniqueString(deployment().name, 'uksouth')}-public-ip'
   params: {
-    name: 'dwwaf-vms-nsg'
+    name: 'bastionhostdbr1-pip'
     location: 'uksouth'
   }
 }
+
+// module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
+//   name: '${uniqueString(deployment().name, 'uksouth')}-vmachine-nsg'
+//   params: {
+//     name: 'dwwaf-vms-nsg'
+//     location: 'uksouth'
+//   }
+// }
 
 module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
@@ -49,5 +57,6 @@ module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
     name: 'bastionhostdbr1'
     vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
     location: 'uksouth'
+    bastionSubnetPublicIpResourceId: publicIpAddress.outputs.resourceId
   }
 }
