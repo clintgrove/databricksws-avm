@@ -48,6 +48,6 @@ module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
   params: {
     name: 'bastionhostdbr1'
     vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
-    location: '<location>'
+    location: 'uksouth'
   }
 }
