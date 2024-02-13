@@ -240,6 +240,22 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   }
 }
 
+module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
+  dependsOn: [
+    privateEndpoint
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
+  params: {
+    name: privateDnsZoneName
+    location: 'global'
+    virtualNetworkLinks: [
+      {
+        registrationEnabled: true
+        virtualNetworkResourceId: vnetwork.outputs.resourceId 
+      }
+    ]
+  }
+}
 
 module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   dependsOn: [
@@ -268,22 +284,6 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
   }
 }
 
-module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
-  dependsOn: [
-    privateEndpoint
-  ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
-  params: {
-    name: privateDnsZoneName
-    location: 'global'
-    virtualNetworkLinks: [
-      {
-        registrationEnabled: true
-        virtualNetworkResourceId: vnetwork.outputs.resourceId 
-      }
-    ]
-  }
-}
 
 resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
   name: pvtEndpointDnsGroupName
@@ -319,7 +319,6 @@ resource pvtEndpointDnsGroup_browserAuth 'Microsoft.Network/privateEndpoints/pri
   dependsOn: [
     privateEndpoint_browserAuth
     privateDnsZone
-    pvtEndpointDnsGroup
-    //privateDnsZoneName_privateDnsZoneName_link
+    //pvtEndpointDnsGroup
   ]
 }

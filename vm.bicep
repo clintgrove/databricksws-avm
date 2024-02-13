@@ -42,3 +42,12 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
     location: 'uksouth'
   }
 }
+
+module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
+  name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
+  params: {
+    name: 'bastionhostdbr1'
+    vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
+    location: '<location>'
+  }
+}
