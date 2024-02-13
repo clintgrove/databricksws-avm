@@ -17,6 +17,14 @@ param workspaceName string = 'dwwaf002'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
 
+@description('Specify whether to provision new vnet or deploy to existing vnet')
+@allowed([
+  'new'
+  'existing'
+])
+param vnetNewOrExisting string = 'existing'
+
+param vnetName string = 'dwwaf-vnet'
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointName = '${workspaceName}-pvtEndpoint'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
@@ -117,13 +125,13 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
   }
 }
 
-module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
+module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOrExisting == 'new') {
   dependsOn: [
     nsg
   ]
   name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-vnet'
   params: {
-    name: 'dwwaf-vnet'
+    name: vnetName
     location: 'uksouth'
     addressPrefixes: vnetCidr
     subnets: [
