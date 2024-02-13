@@ -142,6 +142,9 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
       }
       {
         name: publicSubnetName
+        dependsOn: [
+          privateSubnetName
+        ]
         addressPrefix: publicSubnetCidr
         networkSecurityGroupResourceId: nsg.outputs.resourceId
         delegations: [
@@ -155,12 +158,21 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
       }
       {
         name: PrivateEndpointSubnetName
+        dependsOn: [
+          privateSubnetName
+          publicSubnetName
+        ]
         addressPrefix: privateEndpointSubnetCidr
         privateEndpointNetworkPolicies: 'Disabled'
 
       }
       {
         name: 'AzureBastionSubnet'
+        dependsOn: [
+          privateSubnetName
+          publicSubnetName
+          PrivateEndpointSubnetName
+        ]
         addressPrefix: '10.101.129.0/26'
       }
     ]
