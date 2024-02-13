@@ -18,10 +18,11 @@ param workspaceName string = 'dwwaf002'
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointName = '${workspaceName}-pvtEndpoint'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
+var pvtEndpointDnsGroupName = '${privateEndpointName}/mydnsgroupname'
 var pvtEndpointDnsGroupNameBrowserAuth = '${privateEndpointNameBrowserAuth}/mydnsgroupname'
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
-  name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-nsg'
+  name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-nsg'
   params: {
     name: 'dwwaf-nsg'
     location: 'uksouth'
@@ -118,7 +119,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
   dependsOn: [
     nsg
   ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-test-dwwaf-vnet'
+  name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-vnet'
   params: {
     name: 'dwwaf-vnet'
     location: 'uksouth'
@@ -234,22 +235,6 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   }
 }
 
-module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
-  dependsOn: [
-    privateEndpoint
-  ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
-  params: {
-    name: privateDnsZoneName
-    location: 'global'
-    virtualNetworkLinks: [
-      {
-        registrationEnabled: true
-        virtualNetworkResourceId: vnetwork.outputs.resourceId 
-      }
-    ]
-  }
-}
 
 module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   dependsOn: [
@@ -276,4 +261,60 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
       }
     ]
   }
+}
+
+module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
+  dependsOn: [
+    privateEndpoint
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
+  params: {
+    name: privateDnsZoneName
+    location: 'global'
+    virtualNetworkLinks: [
+      {
+        registrationEnabled: true
+        virtualNetworkResourceId: vnetwork.outputs.resourceId 
+      }
+    ]
+  }
+}
+
+resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
+  name: pvtEndpointDnsGroupName
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config1'
+        properties: {
+          privateDnsZoneId: privateDnsZone.outputs.resourceId
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    privateEndpoint
+  ]
+}
+
+//this adds a configuration in the private endpoint dns group for browser authentication
+//you can see it when you go to the private endpoint in the portal and go to the DNS configuration tab
+resource pvtEndpointDnsGroup_browserAuth 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
+  name: pvtEndpointDnsGroupNameBrowserAuth
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config2'
+        properties: {
+          privateDnsZoneId: privateDnsZone.outputs.resourceId
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    privateEndpoint_browserAuth
+    privateDnsZone
+    pvtEndpointDnsGroup
+    //privateDnsZoneName_privateDnsZoneName_link
+  ]
 }
