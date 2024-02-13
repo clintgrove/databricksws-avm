@@ -14,6 +14,8 @@ param PrivateEndpointSubnetName string = 'default'
 param vnetCidr array = ['10.101.0.0/16']
 @description('The name of the workspace to create.')
 param workspaceName string = 'dwwaf002'
+@description('vnet prefix address')
+param vnetAddressPrefixParam string = '10.101' 
 
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointName = '${workspaceName}-pvtEndpoint'
@@ -160,7 +162,6 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
       {
         name: 'AzureBastionSubnet'
         addressPrefix: '10.101.129.0/26'
-        //networkSecurityGroupResourceId: '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/networkSecurityGroups/dwwaf-vnet-AzureBastionSubnet-nsg-uksouth'
       }
     ]
   }
@@ -187,32 +188,9 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     skuName: 'premium'
     storageAccountName: 'dev${uniqueString(resourceGroup().id)}stg'
     storageAccountSkuName: 'Standard_ZRS'
-    vnetAddressPrefix: '10.101' 
-    roleAssignments: [
-      {
-        principalId: '5d39eec6-6d61-4be7-bc0d-f411a9e67d6a' //adornglobal
-        principalType: 'User'
-        roleDefinitionIdOrName: 'Contributor'
-      }
-    ]
+    vnetAddressPrefix: vnetAddressPrefixParam
   }
 }
-
-// module accessConnector 'br/public:avm/res/databricks/access-connector:0.1.0' = {
-//   name: '${uniqueString(deployment().name, 'uksouth')}-dbraccessconnector'
-//   params: {
-//     name: 'dacmin001'
-//     location: 'uksouth'
-//     roleAssignments: [
-//       {
-//         principalId: '5d39eec6-6d61-4be7-bc0d-f411a9e67d6a' //adornglobal
-//         principalType: 'User'
-//         roleDefinitionIdOrName: 'Owner'
-//       }
-//     ]
-    
-//   }
-// }
 
 module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   dependsOn: [
@@ -260,8 +238,6 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
 module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   dependsOn: [
     privateEndpoint
-    vnetwork
-    workspace
     privateDnsZone
   ]
   name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
@@ -287,6 +263,9 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
 
 resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
   name: pvtEndpointDnsGroupName
+  dependsOn: [
+    privateEndpoint
+  ]
   properties: {
     privateDnsZoneConfigs: [
       {
@@ -297,15 +276,16 @@ resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
       }
     ]
   }
-  dependsOn: [
-    privateEndpoint
-  ]
 }
 
 //this adds a configuration in the private endpoint dns group for browser authentication
 //you can see it when you go to the private endpoint in the portal and go to the DNS configuration tab
 resource pvtEndpointDnsGroup_browserAuth 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
   name: pvtEndpointDnsGroupNameBrowserAuth
+  dependsOn: [
+    privateEndpoint_browserAuth
+    privateDnsZone
+  ]
   properties: {
     privateDnsZoneConfigs: [
       {
@@ -316,9 +296,4 @@ resource pvtEndpointDnsGroup_browserAuth 'Microsoft.Network/privateEndpoints/pri
       }
     ]
   }
-  dependsOn: [
-    privateEndpoint_browserAuth
-    privateDnsZone
-    //pvtEndpointDnsGroup
-  ]
 }
