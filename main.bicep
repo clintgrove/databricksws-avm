@@ -2,12 +2,12 @@
 param publicSubnetName string = 'public-subnet'
 @description('CIDR range for the public subnet.')
 param publicSubnetCidr string = '10.101.64.0/18'
+@description('The name of the private subnet to create.')
+param privateSubnetName string = 'private-subnet'
 @description('CIDR range for the private subnet.')
 param privateSubnetCidr string = '10.101.0.0/18'
 @description('CIDR range for the private endpoint subnet..')
 param privateEndpointSubnetCidr string = '10.101.128.0/24'
-@description('The name of the private subnet to create.')
-param privateSubnetName string = 'private-subnet'
 @description('The name of the subnet to create the private endpoint in.')
 param PrivateEndpointSubnetName string = 'default'
 @description('CIDR range for the vnet.')
@@ -128,12 +128,12 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
     addressPrefixes: vnetCidr
     subnets: [
       {
-        name: publicSubnetName
-        addressPrefix: publicSubnetCidr
+        name: privateSubnetName
+        addressPrefix: privateSubnetCidr
         networkSecurityGroupResourceId: nsg.outputs.resourceId
         delegations: [
             {
-              name: 'databricks-del-public'
+              name: 'databricks-del-private'
               properties: {
                 serviceName: 'Microsoft.Databricks/workspaces'
               }
@@ -141,12 +141,12 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = {
           ]
       }
       {
-        name: privateSubnetName
-        addressPrefix: privateSubnetCidr
+        name: publicSubnetName
+        addressPrefix: publicSubnetCidr
         networkSecurityGroupResourceId: nsg.outputs.resourceId
         delegations: [
             {
-              name: 'databricks-del-private'
+              name: 'databricks-del-public'
               properties: {
                 serviceName: 'Microsoft.Databricks/workspaces'
               }
@@ -175,8 +175,8 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-databricksworkspace'
   params: {
     name: workspaceName
-    customPrivateSubnetName: vnetwork.outputs.subnetNames[1]
-    customPublicSubnetName: vnetwork.outputs.subnetNames[0]
+    customPrivateSubnetName: vnetwork.outputs.subnetNames[0]
+    customPublicSubnetName: vnetwork.outputs.subnetNames[1]
     customVirtualNetworkResourceId: vnetwork.outputs.resourceId
     disablePublicIp: true
     location: 'uksouth'
