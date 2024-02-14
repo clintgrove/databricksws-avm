@@ -100,22 +100,20 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
         type: 'Lifecycle'
       }
     ]
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Deny'
-      ipRules: [
-        {
-          action: 'Allow'
-          value: '1.1.1.1'
+    privateEndpoints: [
+      {
+        privateDnsZoneResourceIds: [
+          '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/privatelink.azuredatabricks.net'
+        ]
+        service: 'blob'
+        subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
+        tags: {
+          Environment: 'Non-Prod'
+          'hidden-title': 'This is visible in the resource name'
+          Role: 'DeploymentValidation'
         }
-      ]
-      virtualNetworkRules: [
-        {
-          action: 'Allow'
-          id:  resourceId('Microsoft.Network/virtualNetworks/', 'dwwaf-vnet')
-        }
-      ]
-    }
+      }
+    ]
     sasExpirationPeriod: '180.00:00:00'
     skuName: 'Standard_LRS'
     tags: {
