@@ -9,12 +9,12 @@ on:
   push:
     branches:
       - main
-    
-jobs:
-  deploy-databricks-and-vm:
-    runs-on: ubuntu-latest
-    steps:
 
+jobs:
+  azure-login:
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Checkout code
       uses: actions/checkout@main
 
@@ -22,6 +22,14 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+  deploy-databricks:
+    needs: azure-login
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@main
 
     - name: Databricks Deploy Bicep file
       uses: azure/arm-deploy@v1
@@ -31,10 +39,34 @@ jobs:
         template: ./main.bicep
         failOnStdErr: false
 
+  deploy-vm:
+    needs: azure-login
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@main
+
     - name: VM Deploy Bicep file
       uses: azure/arm-deploy@v1
       with:
-         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
-         resourceGroupName: ${{ secrets.AZURE_RG }}
-         template: ./vm.bicep
-         failOnStdErr: false
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+        resourceGroupName: ${{ secrets.AZURE_RG }}
+        template: ./vm.bicep
+        failOnStdErr: false
+
+  deploy-storage:
+    needs: azure-login
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@main
+
+    - name: Storage Deploy Bicep file
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+        resourceGroupName: ${{ secrets.AZURE_RG }}
+        template: ./storage.bicep
+        failOnStdErr: false
