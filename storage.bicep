@@ -27,6 +27,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
       ]
       deleteRetentionPolicyDays: 9
       deleteRetentionPolicyEnabled: true
+      lastAccessTimeTrackingPolicyEnabled: true
     }
     enableHierarchicalNamespace: true
     enableNfsV3: true
