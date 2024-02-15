@@ -1,4 +1,7 @@
 module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
+  dependsOn: [
+    privateDnsZone
+  ]
   name: '${uniqueString(deployment().name, 'uksouth')}-storageaccount-deploy'
   params: {
     name: '${uniqueString(resourceGroup().id)}lakestore'
