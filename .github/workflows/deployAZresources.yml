@@ -34,8 +34,7 @@ jobs:
         with:
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./main.bicep
-          parameters: |
-           vnetNewOrExisting: ${{ github.event.inputs.newOrExistingVNET }}
+          parameters: vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}
           failOnStdErr: false
 
   deploy-vm:
