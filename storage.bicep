@@ -132,7 +132,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
 }
 
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'newdnszone-stg-dfs'
+  name: 'dnszone.stg.dfs'
   location: 'global'
 }
 
