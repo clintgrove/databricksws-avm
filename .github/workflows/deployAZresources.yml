@@ -15,56 +15,56 @@ on:
       - main
 
 jobs:
-  deploy-databricks:
-    runs-on: ubuntu-latest
+  # deploy-databricks:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@main
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@main
 
-      - name: Set up Azure credentials
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #     - name: Set up Azure credentials
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Set Azure subscription context
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
-      - name: Databricks Deploy Bicep file
-        uses: azure/arm-deploy@v1
-        with:
-          resourceGroupName: ${{ secrets.AZURE_RG }}
-          template: ./main.bicep
-          parameters: vnetNewOrExisting=existing          #${{ github.event.inputs.newOrExistingVNET }}
-          failOnStdErr: false
+  #     - name: Set Azure subscription context
+  #       run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+  #     - name: Databricks Deploy Bicep file
+  #       uses: azure/arm-deploy@v1
+  #       with:
+  #         resourceGroupName: ${{ secrets.AZURE_RG }}
+  #         template: ./main.bicep
+  #         parameters: vnetNewOrExisting=existing          #${{ github.event.inputs.newOrExistingVNET }}
+  #         failOnStdErr: false
 
-  deploy-vm:
-        runs-on: ubuntu-latest
-        needs:  deploy-databricks
+  # deploy-vm:
+  #       runs-on: ubuntu-latest
+  #       needs:  deploy-databricks
 
-        steps:
-        - name: Checkout code
-          uses: actions/checkout@main
+  #       steps:
+  #       - name: Checkout code
+  #         uses: actions/checkout@main
 
-        - name: Set up Azure credentials
-          uses: azure/login@v1
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #       - name: Set up Azure credentials
+  #         uses: azure/login@v1
+  #         with:
+  #           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-        - name: Set Azure subscription context
-          run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+  #       - name: Set Azure subscription context
+  #         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
-        - name: VM Deploy Bicep file
-          uses: azure/arm-deploy@v1
-          with:
-            resourceGroupName: ${{ secrets.AZURE_RG }}
-            template: ./vm.bicep
-            failOnStdErr: false
+  #       - name: VM Deploy Bicep file
+  #         uses: azure/arm-deploy@v1
+  #         with:
+  #           resourceGroupName: ${{ secrets.AZURE_RG }}
+  #           template: ./vm.bicep
+  #           failOnStdErr: false
 
   deploy-storage:
       runs-on: ubuntu-latest
-      needs:  
-        - deploy-databricks
-        - deploy-vm
+      # needs:  
+      #   - deploy-databricks
+      #   - deploy-vm
 
       steps:
       - name: Checkout code

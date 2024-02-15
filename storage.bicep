@@ -136,7 +136,7 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
     name: 'stg-dfs-private-endpoint'
     location: 'uksouth'
     subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
-    privateDnsZoneGroupName: 'default'
+    privateDnsZoneGroupName: 'config-dfs'
     privateLinkServiceConnections: [
       {
         name: 'stg-dfs-private-endpoint'
