@@ -155,7 +155,7 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
 
   name: '${uniqueString(deployment().name, 'uksouth')}-dfs-pvdnszone'
   params: {
-    name: 'privatelink.dfs.core..net'
+    name: 'privatelink.dfs.core.net'
     location: 'global'
     virtualNetworkLinks: [
       {
