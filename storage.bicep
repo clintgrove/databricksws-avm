@@ -1,3 +1,4 @@
+param privateDnsZoneName string = 'privatelink.dfs.core.windows.net'
 module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-storageaccount-deploy'
   params: {
@@ -133,13 +134,7 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
 
   name: '${uniqueString(deployment().name, 'uksouth')}-dfs-pvdnszone'
   params: {
-    name: 'privatelink.dfs.core.windows.net'
+    name: privateDnsZoneName
     location: 'global'
-    virtualNetworkLinks: [
-      {
-        registrationEnabled: true
-        virtualNetworkResourceId: resourceId('Microsoft.Network/virtualNetworks/', 'dwwaf-vnet')
-      }
-    ]
   }
 }
