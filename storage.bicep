@@ -112,7 +112,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
       {
         name: 'stg-dfs-private-endpoint'
         privateDnsZoneResourceIds: [
-          '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/newdnszone-stg-dfs'
+          '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/dnszone.stg.dfs'
         ]
         service: 'dfs'
         subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
