@@ -9,6 +9,10 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
       containerDeleteRetentionPolicyEnabled: true
       containers: [
         {
+          name: 'dbricksdefault'
+          publicAccess: 'None'
+        }
+        {
           enableNfsV3AllSquash: true
           enableNfsV3RootSquash: true
           name: 'avdscripts'
@@ -104,13 +108,12 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
     privateEndpoints: [
       {
         privateDnsZoneResourceIds: [
-          '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/privatelink.azuredatabricks.net'
+          privateDnsZone.outputs.resourceId
         ]
-        service: 'blob'
+        service: 'dfs'
         subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
         tags: {
           Environment: 'Non-Prod'
-          'hidden-title': 'This is visible in the resource name'
           Role: 'DeploymentValidation'
         }
       }
@@ -119,8 +122,46 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
     skuName: 'Standard_LRS'
     tags: {
       Environment: 'Non-Prod'
-      'hidden-title': 'This is visible in the resource name'
       Role: 'DeploymentValidation'
     }
+  }
+}
+
+module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
+  dependsOn: [
+    storageAccount
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-dbr-privateendpoint-dfs'
+  params: {
+    name: 'stg-dfs-private-endpoint'
+    location: 'uksouth'
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
+    privateDnsZoneGroupName: 'default'
+    privateLinkServiceConnections: [
+      {
+        name: 'stg-dfs-private-endpoint'
+        properties: {
+          groupIds: [
+            'dfs'
+          ]
+          privateLinkServiceId: storageAccount.outputs.resourceId
+        }
+      }
+    ]
+  }
+}
+
+module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
+
+  name: '${uniqueString(deployment().name, 'uksouth')}-dfs-pvdnszone'
+  params: {
+    name: 'privatelink.dfs.core..net'
+    location: 'global'
+    virtualNetworkLinks: [
+      {
+        registrationEnabled: true
+        virtualNetworkResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
+      }
+    ]
   }
 }
