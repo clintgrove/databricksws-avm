@@ -4,12 +4,12 @@ on:
     inputs:
       paramRG:
         description: 'Parameter for resource group'
-        required: true
+        required: false
         default: 'dbr-private-rg-1'
       newOrExistingVNET: 
         description: 'Parameter for new or existing VNET'
         required: true
-        default: 'existing'
+        default: existing
   push:
     branches:
       - main
@@ -34,7 +34,7 @@ jobs:
         with:
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./main.bicep
-          parameters: vnetNewOrExisting=existing 
+          parameters: vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}
           failOnStdErr: false
 
   deploy-vm:
