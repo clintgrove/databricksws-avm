@@ -107,8 +107,9 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
     ]
     privateEndpoints: [
       {
+        name: 'stg-dfs-private-endpoint'
         privateDnsZoneResourceIds: [
-          '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/privatelink.dfs.core.windows.net'
+          '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/newdnszone-stg-dfs'
         ]
         service: 'dfs'
         subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
@@ -124,6 +125,37 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
       Environment: 'Non-Prod'
       Role: 'DeploymentValidation'
     }
+  }
+}
+
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'newdnszone-stg-dfs'
+  location: 'global'
+}
+
+resource pe_dns_vnetwrk_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZone
+  name: 'newdnszone-stg-dfs-link'
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
+    }
+  }
+}
+
+resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-09-01' = {
+  name: 'stg-dfs-private-endpoint/mydnsgroup'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config1dfs'
+        properties: {
+          privateDnsZoneId: privateDnsZone.id
+        }
+      }
+    ]
   }
 }
 
@@ -151,17 +183,17 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
 //   }
 // }
 
-module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
+// module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
 
-  name: '${uniqueString(deployment().name, 'uksouth')}-dfs-pvdnszone'
-  params: {
-    name: 'privatelink.dfs.core.net'
-    location: 'global'
-    virtualNetworkLinks: [
-      {
-        registrationEnabled: true
-        virtualNetworkResourceId: resourceId('Microsoft.Network/virtualNetworks/', 'dwwaf-vnet')
-      }
-    ]
-  }
-}
+//   name: '${uniqueString(deployment().name, 'uksouth')}-dfs-pvdnszone'
+//   params: {
+//     name: 'privatelink.dfs.core.net'
+//     location: 'global'
+//     virtualNetworkLinks: [
+//       {
+//         registrationEnabled: true
+//         virtualNetworkResourceId: resourceId('Microsoft.Network/virtualNetworks/', 'dwwaf-vnet')
+//       }
+//     ]
+//   }
+// }
