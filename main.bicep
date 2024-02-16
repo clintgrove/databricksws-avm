@@ -268,7 +268,7 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
     name: privateEndpointNameBrowserAuth
     location: 'uksouth'
     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-    privateDnsZoneGroupName: pvtEndpointDnsGroupNameBrowserAuth
+    privateDnsZoneGroupName: 'config2'
     privateDnsZoneResourceIds: [
       privateDnsZone.outputs.resourceId
     ]
@@ -306,20 +306,20 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
 
 //this adds a configuration in the private endpoint dns group for browser authentication
 //you can see it when you go to the private endpoint in the portal and go to the DNS configuration tab
-resource pvtEndpointDnsGroup_browserAuth 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
-  name: pvtEndpointDnsGroupNameBrowserAuth
-  dependsOn: [
-    privateEndpoint_browserAuth
-    privateDnsZone
-  ]
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'config2'
-        properties: {
-          privateDnsZoneId: privateDnsZone.outputs.resourceId
-        }
-      }
-    ]
-  }
-}
+// resource pvtEndpointDnsGroup_browserAuth 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
+//   name: pvtEndpointDnsGroupNameBrowserAuth
+//   dependsOn: [
+//     privateEndpoint_browserAuth
+//     privateDnsZone
+//   ]
+//   properties: {
+//     privateDnsZoneConfigs: [
+//       {
+//         name: 'config2'
+//         properties: {
+//           privateDnsZoneId: privateDnsZone.outputs.resourceId
+//         }
+//       }
+//     ]
+//   }
+// }
