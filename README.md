@@ -1,5 +1,12 @@
 # databricksws-avm
 
+This repository contains a pattern of bicep modules from the aka.ms/avm
+
+It deploys a Databricks workspace
+A Virtual Network with subnets
+A Network Security Group
+
+
 Steps 
 
 #### deployment
