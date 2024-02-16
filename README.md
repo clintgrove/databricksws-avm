@@ -20,6 +20,7 @@ The basic deployment of Databricks with its virtual networks
 - Private Endpoints
 - Private DNS Zone for Databricks
 
+
 The Virtual Machine
 - Creates a Microsoft windows server 2022 Data centre
 - Bastion host linked to the Virtual network which is created in the above steps
