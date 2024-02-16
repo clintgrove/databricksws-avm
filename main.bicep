@@ -223,7 +223,7 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
     name: privateEndpointName
     location: 'uksouth'
     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-    privateDnsZoneGroupName: pvtEndpointDnsGroupName
+    privateDnsZoneGroupName: 'config1'
     privateDnsZoneResourceIds: [
       privateDnsZone.outputs.resourceId
     ]
