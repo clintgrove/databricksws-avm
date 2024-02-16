@@ -223,7 +223,10 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
     name: privateEndpointName
     location: 'uksouth'
     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-    privateDnsZoneGroupName: 'config1'
+    privateDnsZoneGroupName: pvtEndpointDnsGroupName
+    privateDnsZoneResourceIds: [
+      privateDnsZone.outputs.resourceId
+    ]
     privateLinkServiceConnections: [
       {
         name: privateEndpointName
@@ -239,9 +242,9 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
 }
 
 module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
-  dependsOn: [
-    privateEndpoint
-  ]
+  // dependsOn: [
+  //   privateEndpoint
+  // ]
   name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
   params: {
     name: privateDnsZoneName
@@ -266,6 +269,9 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
     location: 'uksouth'
     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
     privateDnsZoneGroupName: pvtEndpointDnsGroupNameBrowserAuth
+    privateDnsZoneResourceIds: [
+      privateDnsZone.outputs.resourceId
+    ]
     privateLinkServiceConnections: [
       {
         name: privateEndpointNameBrowserAuth
@@ -281,22 +287,22 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
 }
 
 
-resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
-  name: pvtEndpointDnsGroupName
-  dependsOn: [
-    privateEndpoint
-  ]
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'config1'
-        properties: {
-          privateDnsZoneId: privateDnsZone.outputs.resourceId
-        }
-      }
-    ]
-  }
-}
+// resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
+//   name: pvtEndpointDnsGroupName
+//   dependsOn: [
+//     privateEndpoint
+//   ]
+//   properties: {
+//     privateDnsZoneConfigs: [
+//       {
+//         name: 'config1'
+//         properties: {
+//           privateDnsZoneId: privateDnsZone.outputs.resourceId
+//         }
+//       }
+//     ]
+//   }
+// }
 
 //this adds a configuration in the private endpoint dns group for browser authentication
 //you can see it when you go to the private endpoint in the portal and go to the DNS configuration tab
