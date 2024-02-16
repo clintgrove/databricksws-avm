@@ -28,8 +28,7 @@ param vnetName string = 'dwwaf-vnet'
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointName = '${workspaceName}-pvtEndpoint'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
-var pvtEndpointDnsGroupName = '${privateEndpointName}/mydnsgroupname'
-var pvtEndpointDnsGroupNameBrowserAuth = '${privateEndpointNameBrowserAuth}/mydnsgroupname'
+
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-nsg'
@@ -224,6 +223,9 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
     location: 'uksouth'
     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
     privateDnsZoneGroupName: 'config1'
+    privateDnsZoneResourceIds: [
+      privateDnsZone.outputs.resourceId
+    ]
     privateLinkServiceConnections: [
       {
         name: privateEndpointName
@@ -239,10 +241,7 @@ module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
 }
 
 module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
-  dependsOn: [
-    privateEndpoint
-  ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
+ name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
   params: {
     name: privateDnsZoneName
     location: 'global'
@@ -265,7 +264,10 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
     name: privateEndpointNameBrowserAuth
     location: 'uksouth'
     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-    privateDnsZoneGroupName: pvtEndpointDnsGroupNameBrowserAuth
+    privateDnsZoneGroupName: 'config2'
+    privateDnsZoneResourceIds: [
+      privateDnsZone.outputs.resourceId
+    ]
     privateLinkServiceConnections: [
       {
         name: privateEndpointNameBrowserAuth
@@ -280,40 +282,4 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
   }
 }
 
-
-resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
-  name: pvtEndpointDnsGroupName
-  dependsOn: [
-    privateEndpoint
-  ]
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'config1'
-        properties: {
-          privateDnsZoneId: privateDnsZone.outputs.resourceId
-        }
-      }
-    ]
-  }
-}
-
-//this adds a configuration in the private endpoint dns group for browser authentication
-//you can see it when you go to the private endpoint in the portal and go to the DNS configuration tab
-resource pvtEndpointDnsGroup_browserAuth 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = {
-  name: pvtEndpointDnsGroupNameBrowserAuth
-  dependsOn: [
-    privateEndpoint_browserAuth
-    privateDnsZone
-  ]
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'config2'
-        properties: {
-          privateDnsZoneId: privateDnsZone.outputs.resourceId
-        }
-      }
-    ]
-  }
-}
+output vnetId string = vnetwork.outputs.resourceId
