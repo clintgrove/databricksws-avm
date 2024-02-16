@@ -10,9 +10,7 @@ on:
         description: 'Parameter for new or existing VNET'
         required: true
         default: existing
-  push:
-    branches:
-      - main
+
 
 jobs:
   deploy-databricks:
