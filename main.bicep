@@ -149,9 +149,6 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
       }
       {
         name: publicSubnetName
-        dependsOn: [
-          privateSubnetName
-        ]
         addressPrefix: publicSubnetCidr
         networkSecurityGroupResourceId: nsg.outputs.resourceId
         delegations: [
@@ -165,21 +162,12 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
       }
       {
         name: PrivateEndpointSubnetName
-        dependsOn: [
-          privateSubnetName
-          publicSubnetName
-        ]
         addressPrefix: privateEndpointSubnetCidr
         privateEndpointNetworkPolicies: 'Disabled'
 
       }
       {
         name: 'AzureBastionSubnet'
-        dependsOn: [
-          privateSubnetName
-          publicSubnetName
-          PrivateEndpointSubnetName
-        ]
         addressPrefix: '10.101.129.0/26'
       }
     ]
@@ -199,7 +187,8 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     customVirtualNetworkResourceId: vnetwork.outputs.resourceId
     disablePublicIp: true
     location: 'uksouth'
-    natGatewayName: nsg.outputs.name
+    publicIpName: 'nat-gw-public-ip'
+    natGatewayName: 'nat-gateway' //nsg.outputs.name
     prepareEncryption: true
     publicNetworkAccess: 'Disabled'
     requiredNsgRules: 'NoAzureDatabricksRules'
@@ -208,37 +197,49 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     storageAccountName: 'dev${uniqueString(resourceGroup().id)}stg'
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: vnetAddressPrefixParam
-  }
-}
-
-module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
-  dependsOn: [
-    workspace
-    vnetwork
-    nsg
-  ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-dbr-privateendpoint'
-  params: {
-    name: privateEndpointName
-    location: 'uksouth'
-    subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-    privateDnsZoneGroupName: 'config1'
-    privateDnsZoneResourceIds: [
-      privateDnsZone.outputs.resourceId
-    ]
-    privateLinkServiceConnections: [
+    privateEndpoints: [
       {
-        name: privateEndpointName
-        properties: {
-          groupIds: [
-            'databricks_ui_api'
-          ]
-          privateLinkServiceId: workspace.outputs.resourceId
+        privateDnsZoneResourceIds: [
+          privateDnsZone.outputs.resourceId
+        ]
+        subnetResourceId: vnetwork.outputs.subnetNames[2]
+        tags: {
+          Environment: 'Non-Prod'
+          Role: 'DeploymentValidation'
         }
       }
     ]
   }
 }
+
+// module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
+//   dependsOn: [
+//     workspace
+//     vnetwork
+//     nsg
+//   ]
+//   name: '${uniqueString(deployment().name, 'uksouth')}-dbr-privateendpoint'
+//   params: {
+//     name: privateEndpointName
+//     location: 'uksouth'
+//     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
+//     privateDnsZoneGroupName: 'config1'
+//     privateDnsZoneResourceIds: [
+//       privateDnsZone.outputs.resourceId
+//     ]
+//     privateLinkServiceConnections: [
+//       {
+//         name: privateEndpointName
+//         properties: {
+//           groupIds: [
+//             'databricks_ui_api'
+//           ]
+//           privateLinkServiceId: workspace.outputs.resourceId
+//         }
+//       }
+//     ]
+//   }
+// }
 
 module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
@@ -254,32 +255,32 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
   }
 }
 
-module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
-  dependsOn: [
-    privateEndpoint
-    privateDnsZone
-  ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
-  params: {
-    name: privateEndpointNameBrowserAuth
-    location: 'uksouth'
-    subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-    privateDnsZoneGroupName: 'config2'
-    privateDnsZoneResourceIds: [
-      privateDnsZone.outputs.resourceId
-    ]
-    privateLinkServiceConnections: [
-      {
-        name: privateEndpointNameBrowserAuth
-        properties: {
-          groupIds: [
-            'browser_authentication'
-          ]
-          privateLinkServiceId: workspace.outputs.resourceId
-        }
-      }
-    ]
-  }
-}
+// module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
+//   dependsOn: [
+//     privateEndpoint
+//     privateDnsZone
+//   ]
+//   name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
+//   params: {
+//     name: privateEndpointNameBrowserAuth
+//     location: 'uksouth'
+//     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
+//     privateDnsZoneGroupName: 'config2'
+//     privateDnsZoneResourceIds: [
+//       privateDnsZone.outputs.resourceId
+//     ]
+//     privateLinkServiceConnections: [
+//       {
+//         name: privateEndpointNameBrowserAuth
+//         properties: {
+//           groupIds: [
+//             'browser_authentication'
+//           ]
+//           privateLinkServiceId: workspace.outputs.resourceId
+//         }
+//       }
+//     ]
+//   }
+// }
 
 output vnetId string = vnetwork.outputs.resourceId
