@@ -9,7 +9,7 @@ param privateSubnetCidr string = '10.101.0.0/18'
 @description('CIDR range for the private endpoint subnet..')
 param privateEndpointSubnetCidr string = '10.101.128.0/24'
 @description('The name of the subnet to create the private endpoint in.')
-param PrivateEndpointSubnetName string = 'default'
+param PrivateEndpointSubnetName string = 'defaultSubNet'
 @description('CIDR range for the vnet.')
 param vnetCidr array = ['10.101.0.0/16']
 @description('The name of the workspace to create.')
@@ -163,7 +163,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
       {
         name: PrivateEndpointSubnetName
         addressPrefix: privateEndpointSubnetCidr
-        privateEndpointNetworkPolicies: 'Disabled'
+        //privateEndpointNetworkPolicies: 'Disabled'
 
       }
       {
