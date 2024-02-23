@@ -250,7 +250,7 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
     location: 'global'
     virtualNetworkLinks: [
       {
-        registrationEnabled: true
+        registrationEnabled: false
         virtualNetworkResourceId: vnetwork.outputs.resourceId 
       }
     ]
