@@ -1,17 +1,3 @@
-// @description('The name of the public subnet to create.')
-// param publicSubnetName string = 'public-subnet'
-// @description('CIDR range for the public subnet.')
-// param publicSubnetCidr string = '10.101.64.0/18'
-// @description('The name of the private subnet to create.')
-// param privateSubnetName string = 'private-subnet'
-// @description('CIDR range for the private subnet.')
-// param privateSubnetCidr string = '10.101.0.0/18'
-//@description('CIDR range for the private endpoint subnet..')
-//param privateEndpointSubnetCidr string = '10.101.128.0/24'
-//@description('The name of the subnet to create the private endpoint in.')
-//param PrivateEndpointSubnetName string = 'defaultSub'
-// @description('CIDR range for the vnet.')
-// param vnetCidr array = ['10.101.0.0/16']
 @description('The name of the workspace to create.')
 param workspaceName string = 'dwwaf002'
 @description('vnet prefix address')
@@ -28,9 +14,7 @@ param vnetNewOrExisting string = 'existing'
 
 param vnetName string = 'dwwaf-vnet'
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
-// var privateEndpointName = '${workspaceName}-pvtEndpoint'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
-
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-nsg'
@@ -165,9 +149,6 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
       {
         name: 'defaultSubnet'
         addressPrefix: cidrSubnet(addressPrefix, 20, 0) 
-        //privateEndpointSubnetCidr
-        //privateEndpointNetworkPolicies: 'Disabled'
-
       }
       {
         name: 'AzureBastionSubnet'
@@ -215,34 +196,6 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
   }
 }
 
-// module privateEndpoint 'br/public:avm/res/network/private-endpoint:0.3.3' = {
-//   dependsOn: [
-//     workspace
-//     vnetwork
-//     nsg
-//   ]
-//   name: '${uniqueString(deployment().name, 'uksouth')}-dbr-privateendpoint'
-//   params: {
-//     name: privateEndpointName
-//     location: 'uksouth'
-//     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-//     privateDnsZoneGroupName: 'config1'
-//     privateDnsZoneResourceIds: [
-//       privateDnsZone.outputs.resourceId
-//     ]
-//     privateLinkServiceConnections: [
-//       {
-//         name: privateEndpointName
-//         properties: {
-//           groupIds: [
-//             'databricks_ui_api'
-//           ]
-//           privateLinkServiceId: workspace.outputs.resourceId
-//         }
-//       }
-//     ]
-//   }
-// }
 
 module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
