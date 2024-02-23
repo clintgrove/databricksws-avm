@@ -28,7 +28,7 @@ param vnetNewOrExisting string = 'existing'
 param vnetName string = 'dwwaf-vnet'
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 // var privateEndpointName = '${workspaceName}-pvtEndpoint'
-// var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
+var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
@@ -257,32 +257,31 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
   }
 }
 
-// module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
-//   dependsOn: [
-//     privateEndpoint
-//     privateDnsZone
-//   ]
-//   name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
-//   params: {
-//     name: privateEndpointNameBrowserAuth
-//     location: 'uksouth'
-//     subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
-//     privateDnsZoneGroupName: 'config2'
-//     privateDnsZoneResourceIds: [
-//       privateDnsZone.outputs.resourceId
-//     ]
-//     privateLinkServiceConnections: [
-//       {
-//         name: privateEndpointNameBrowserAuth
-//         properties: {
-//           groupIds: [
-//             'browser_authentication'
-//           ]
-//           privateLinkServiceId: workspace.outputs.resourceId
-//         }
-//       }
-//     ]
-//   }
-// }
+module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
+  dependsOn: [
+    privateDnsZone
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
+  params: {
+    name: privateEndpointNameBrowserAuth
+    location: 'uksouth'
+    subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
+    privateDnsZoneGroupName: 'config2'
+    privateDnsZoneResourceIds: [
+      privateDnsZone.outputs.resourceId
+    ]
+    privateLinkServiceConnections: [
+      {
+        name: privateEndpointNameBrowserAuth
+        properties: {
+          groupIds: [
+            'browser_authentication'
+          ]
+          privateLinkServiceId: workspace.outputs.resourceId
+        }
+      }
+    ]
+  }
+}
 
 output vnetId string = vnetwork.outputs.resourceId
