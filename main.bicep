@@ -10,13 +10,14 @@
 //param privateEndpointSubnetCidr string = '10.101.128.0/24'
 //@description('The name of the subnet to create the private endpoint in.')
 //param PrivateEndpointSubnetName string = 'defaultSub'
-@description('CIDR range for the vnet.')
-param vnetCidr array = ['10.101.0.0/16']
+// @description('CIDR range for the vnet.')
+// param vnetCidr array = ['10.101.0.0/16']
 @description('The name of the workspace to create.')
 param workspaceName string = 'dwwaf002'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
-var addressPrefix = '10.101.0.0/16'
+
+var addressPrefix = '${vnetAddressPrefixParam}.0.0/16'
 
 @description('Specify whether to provision new vnet or deploy to existing vnet')
 @allowed([
@@ -133,7 +134,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
   params: {
     name: vnetName
     location: 'uksouth'
-    addressPrefixes: vnetCidr
+    addressPrefixes: [addressPrefix]
     subnets: [
       {
         name: 'private-subnet'
