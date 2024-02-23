@@ -196,7 +196,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     requiredNsgRules: 'NoAzureDatabricksRules'
     requireInfrastructureEncryption: true
     skuName: 'premium'
-    storageAccountName: 'dev${uniqueString(resourceGroup().id)}stg'
+    storageAccountName: 'dev2${uniqueString(resourceGroup().id)}stg'
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: vnetAddressPrefixParam
     privateEndpoints: [
