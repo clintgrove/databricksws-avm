@@ -113,7 +113,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
           '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/privatelink.dfs.core.windows.net'
         ]
         service: 'dfs'
-        subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
+        subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'defaultSubnet')
         tags: {
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
