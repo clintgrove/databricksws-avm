@@ -1,11 +1,11 @@
-@description('The name of the public subnet to create.')
-param publicSubnetName string = 'public-subnet'
-@description('CIDR range for the public subnet.')
-param publicSubnetCidr string = '10.101.64.0/18'
-@description('The name of the private subnet to create.')
-param privateSubnetName string = 'private-subnet'
-@description('CIDR range for the private subnet.')
-param privateSubnetCidr string = '10.101.0.0/18'
+// @description('The name of the public subnet to create.')
+// param publicSubnetName string = 'public-subnet'
+// @description('CIDR range for the public subnet.')
+// param publicSubnetCidr string = '10.101.64.0/18'
+// @description('The name of the private subnet to create.')
+// param privateSubnetName string = 'private-subnet'
+// @description('CIDR range for the private subnet.')
+// param privateSubnetCidr string = '10.101.0.0/18'
 //@description('CIDR range for the private endpoint subnet..')
 //param privateEndpointSubnetCidr string = '10.101.128.0/24'
 //@description('The name of the subnet to create the private endpoint in.')
@@ -136,7 +136,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
     addressPrefixes: vnetCidr
     subnets: [
       {
-        name: privateSubnetName
+        name: 'private-subnet'
         addressPrefix: cidrSubnet(addressPrefix, 20, 2) //privateSubnetCidr
         networkSecurityGroupResourceId: nsg.outputs.resourceId
         delegations: [
@@ -149,7 +149,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
           ]
       }
       {
-        name: publicSubnetName
+        name: 'public-subnet'
         addressPrefix: cidrSubnet(addressPrefix, 20, 1) //publicSubnetCidr
         networkSecurityGroupResourceId: nsg.outputs.resourceId
         delegations: [
@@ -204,7 +204,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
         privateDnsZoneResourceIds: [
           privateDnsZone.outputs.resourceId
         ]
-        subnetResourceId: vnetwork.outputs.subnetNames[2]
+        subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
         tags: {
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
