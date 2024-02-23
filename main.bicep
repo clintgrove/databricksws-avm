@@ -9,7 +9,7 @@ param privateSubnetCidr string = '10.101.0.0/18'
 @description('CIDR range for the private endpoint subnet..')
 param privateEndpointSubnetCidr string = '10.101.128.0/24'
 @description('The name of the subnet to create the private endpoint in.')
-param PrivateEndpointSubnetName string = 'default'
+param PrivateEndpointSubnetName string = 'defaultSub'
 @description('CIDR range for the vnet.')
 param vnetCidr array = ['10.101.0.0/16']
 @description('The name of the workspace to create.')
@@ -26,8 +26,8 @@ param vnetNewOrExisting string = 'existing'
 
 param vnetName string = 'dwwaf-vnet'
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
-var privateEndpointName = '${workspaceName}-pvtEndpoint'
-var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
+// var privateEndpointName = '${workspaceName}-pvtEndpoint'
+// var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
