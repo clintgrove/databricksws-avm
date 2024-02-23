@@ -16,7 +16,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
         ipConfigurations: [
           {
             name: 'ipconfig01'
-            subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'default')
+            subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'defaultSubnet')
           }
         ]
         nicSuffix: '-nic-01'
