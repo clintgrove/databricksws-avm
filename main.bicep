@@ -1,5 +1,5 @@
 @description('The name of the workspace to create.')
-param workspaceName string = 'dwwaf002'
+param workspaceName string = 'dbrw002'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
 
@@ -181,6 +181,15 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     storageAccountName: 'dev2${uniqueString(resourceGroup().id)}stg'
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: vnetAddressPrefixParam
+    customerManagedKey: {
+      keyName: 'newcgrkv234'
+      keyVaultResourceId: '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/kvgr/providers/Microsoft.KeyVault/vaults/newcgrkv234'
+    }
+    customerManagedKeyManagedDisk: {
+      keyName: 'newcgrkve234'
+      keyVaultResourceId: '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/kvgr/providers/Microsoft.KeyVault/vaults/newcgrkve234'
+      rotationToLatestKeyVersionEnabled: true
+    }
     privateEndpoints: [
       {
         privateDnsZoneResourceIds: [
