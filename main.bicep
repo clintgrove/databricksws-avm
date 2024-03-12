@@ -182,11 +182,11 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: vnetAddressPrefixParam
     customerManagedKey: {
-      keyName: 'newcgrkv234'
+      keyName: 'keyEncryptionKey'
       keyVaultResourceId: '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/kvgr/providers/Microsoft.KeyVault/vaults/newcgrkv234'
     }
     customerManagedKeyManagedDisk: {
-      keyName: 'newcgrkve234'
+      keyName: 'keyEncryptionKeyDisk'
       keyVaultResourceId: '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/kvgr/providers/Microsoft.KeyVault/vaults/newcgrkve234'
       rotationToLatestKeyVersionEnabled: true
     }
