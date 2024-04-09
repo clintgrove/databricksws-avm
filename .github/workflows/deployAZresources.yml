@@ -27,6 +27,10 @@ jobs:
 
       - name: Set Azure subscription context
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+
+      - name: CreateRG
+        run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
+
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
