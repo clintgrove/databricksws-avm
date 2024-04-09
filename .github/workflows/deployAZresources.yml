@@ -56,7 +56,7 @@ jobs:
           with:
             resourceGroupName: ${{ secrets.AZURE_RG }}
             template: ./vm.bicep
-            parameters: vmpassword=${{ secrets.VM_PASSWORDpppp }}
+            parameters: vmpassword=${{secrets.VM_PASSWORD}}
             failOnStdErr: false
 
   deploy-storage:
