@@ -1,5 +1,49 @@
 @secure()
 param vmpassword string
+
+resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
+  name: 'kv-groove-cvmwinmin'
+  location: 'uksouth'
+  properties: {
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    tenantId: tenant().tenantId
+    enablePurgeProtection: true // Required for encryption to work
+    softDeleteRetentionInDays: 7
+    enabledForTemplateDeployment: true
+    enabledForDiskEncryption: true
+    enabledForDeployment: true
+    enableRbacAuthorization: true
+    accessPolicies: []
+  }
+
+  resource key 'keys@2022-07-01' = {
+    name: 'keyEncryptionKey'
+    properties: {
+      kty: 'RSA'
+    }
+  }
+}
+
+resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
+  name: 'diskEncryptionvmgroove'
+  location: 'uksouth'
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    activeKey: {
+      sourceVault: {
+        id: keyVault.id
+      }
+      keyUrl: keyVault::key.properties.keyUriWithVersion
+    }
+    encryptionType: 'EncryptionAtRestWithPlatformAndCustomerKeys'
+  }
+}
+
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
@@ -29,11 +73,25 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
       diskSizeGB: '128'
       managedDisk: {
         storageAccountType: 'Premium_LRS'
+        diskEncryptionSet: {
+          id: diskEncryptionSet.id
+        }
       }
     }
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
     adminPassword: vmpassword
+    dataDisks: [
+      {
+        diskSizeGB: 128
+        managedDisk: {
+          storageAccountType: 'Premium_LRS'
+          diskEncryptionSet: {
+            id:  diskEncryptionSet.id
+          }
+        }
+      }
+    ]
   }
 }
 
