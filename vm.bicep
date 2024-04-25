@@ -44,6 +44,19 @@ resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
   }
 }
 
+resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault::key.id, 'Key Vault Crypto User', diskEncryptionSet.id)
+  scope: keyVault
+  properties: {
+    principalId: diskEncryptionSet.identity.principalId
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'e147488a-f6f5-4113-8e2d-b22465e65bf6'
+    ) // Key Vault Crypto Service Encryption User
+    principalType: 'ServicePrincipal'
+  }
+}
+
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
