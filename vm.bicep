@@ -64,7 +64,20 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
-module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
+resource secretPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault::key.id, 'Key Vault Secret Officer', diskEncryptionSet.id)
+  scope: keyVault
+  properties: {
+    principalId: virtualMachine.identity.principalId
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
+    ) // Key Vault Secrets Officer
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
   dependsOn: [keyVault]
   name: '${uniqueString(deployment().name, 'uksouth')}-test-vmwindbricks'
   params: {
@@ -77,12 +90,23 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
       sku: '2022-datacenter-azure-edition'
       version: 'latest'
     }
+    managedIdentities: {
+      systemAssigned: true
+    }
     name: 'vmwindbricks'
     nicConfigurations: [
       {
         ipConfigurations: [
           {
             name: 'ipconfig01'
+            pipConfiguration: {
+              publicIpNameSuffix: '-pip-01'
+              zones: [
+                1
+                2
+                3
+              ]
+            }
             subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'defaultSubnet')
           }
         ]
@@ -101,6 +125,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
     }
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
+    zone: 1
     adminPassword: vmpassword
     dataDisks: [
       {
