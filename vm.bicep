@@ -35,7 +35,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 
 resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
-  name: 'diskEncryptionvmgroove'
+  name: 'diskEncryptionvmwindbricks'
   location: 'uksouth'
   identity: {
     type: 'SystemAssigned'
