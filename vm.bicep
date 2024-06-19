@@ -33,7 +33,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   }
 }
 
-
 resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
   name: 'diskEncryptionvmwindbricks'
   location: 'uksouth'
@@ -50,7 +49,6 @@ resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
     encryptionType: 'EncryptionAtRestWithPlatformAndCustomerKeys'
   }
 }
-
 
 resource secretPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(virtualMachine.name, 'Key Vault Secrets Officer', keyVault.name)
@@ -80,7 +78,7 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
-  dependsOn: [keyVault]
+  dependsOn: [keyVault, keyPermissions]
   name: '${uniqueString(deployment().name, 'uksouth')}-test-vmwindbricks'
   params: {
     // Required parameters
@@ -129,7 +127,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
     zone: 1
-    adminPassword: keyVault::secret.properties.value
+    adminPassword: keyVault.listSecrets().value['vmpassword-fromgithubactions-tokeyvault']
     dataDisks: [
       {
         diskSizeGB: 128
