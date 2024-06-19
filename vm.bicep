@@ -68,7 +68,7 @@ resource secretPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   name: guid(keyVault::key.id, 'Key Vault Secret Officer', diskEncryptionSet.id)
   scope: keyVault
   properties: {
-    principalId: virtualMachine.outputs.systemAssignedMIPrincipalIdf
+    principalId: virtualMachine.outputs.systemAssignedMIPrincipalId
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
@@ -115,7 +115,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
     ]
     osDisk: {
       caching: 'ReadWrite'
-      diskSizeGB: '128'
+      diskSizeGB: 128
       managedDisk: {
         storageAccountType: 'Premium_LRS'
         diskEncryptionSet: {
