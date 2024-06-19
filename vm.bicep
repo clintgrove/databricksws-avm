@@ -1,7 +1,6 @@
 @secure()
 param vmpassword string
 
-
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: 'kv-groove-vmwindbricks'
   location: 'uksouth'
@@ -52,7 +51,7 @@ resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
 }
 
 resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault::key.id, 'Key Vault Crypto User', diskEncryptionSet.id)
+  name: guid(keyVault::key.id, 'Key Vault Crypto Service Encryption User', diskEncryptionSet.id)
   scope: keyVault
   properties: {
     principalId: diskEncryptionSet.identity.principalId
