@@ -127,7 +127,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
     zone: 0
-    adminPassword: keyVault.getSecret('vmpassword-fromgithubactions-tokeyvault')  //keyVault.listSecrets().value['vmpassword-fromgithubactions-tokeyvault']
+    adminPassword: keyVault.getSecret('vmpassword-fromgithubactions-tokeyvault') 
     dataDisks: [
       {
         diskSizeGB: 128
