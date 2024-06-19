@@ -129,7 +129,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
     zone: 1
-    adminPassword: vmpassword
+    adminPassword: keyVault::secret.properties.value
     dataDisks: [
       {
         diskSizeGB: 128
