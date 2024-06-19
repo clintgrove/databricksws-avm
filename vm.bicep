@@ -1,8 +1,9 @@
 @secure()
 param vmpassword string
 
+
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: 'kv-groove-cvmwinmin'
+  name: 'kv-groove-vmwindbricks'
   location: 'uksouth'
   properties: {
     sku: {
@@ -23,6 +24,12 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     name: 'keyEncryptionKey'
     properties: {
       kty: 'RSA'
+    }
+  }
+  resource secret 'secrets@2023-07-01' = {
+    name: 'vmpassword-fromgithubactions-tokeyvault'
+    properties: {
+      value: vmpassword
     }
   }
 }
@@ -58,7 +65,8 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
-  name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
+  dependsOn: [keyVault]
+  name: '${uniqueString(deployment().name, 'uksouth')}-test-vmwindbricks'
   params: {
     // Required parameters
     adminUsername: 'localAdminUser'
@@ -69,7 +77,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
       sku: '2022-datacenter-azure-edition'
       version: 'latest'
     }
-    name: 'cvmwinmin'
+    name: 'vmwindbricks'
     nicConfigurations: [
       {
         ipConfigurations: [
