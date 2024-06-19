@@ -1,4 +1,4 @@
-# Building Databricks with AVM Bicep inside a Private Network
+# Building Databricks inside a Private Network with AVM Bicep 
 
 This repository contains a pattern of bicep modules from the https://aka.ms/avm (or go directly to https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/databricks/workspace)
 
