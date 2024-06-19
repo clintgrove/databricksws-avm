@@ -25,12 +25,12 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       kty: 'RSA'
     }
   }
-  // resource secret 'secrets@2023-07-01' = {
-  //   name: 'vmpassword-fromgithubactions-tokeyvault'
-  //   properties: {
-  //     value: vmpassword
-  //   }
-  // }
+  resource secret 'secrets@2023-07-01' = {
+    name: 'vmpassword-fromgithubactions-tokeyvault'
+    properties: {
+      value: vmpassword
+    }
+  }
 }
 
 
@@ -52,18 +52,18 @@ resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
 }
 
 
-// resource secretPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(keyVault::secret.id, 'Key Vault Secret Officer', diskEncryptionSet.id)
-//   scope: keyVault
-//   properties: {
-//     principalId: virtualMachine.outputs.systemAssignedMIPrincipalId
-//     roleDefinitionId: subscriptionResourceId(
-//       'Microsoft.Authorization/roleDefinitions',
-//       'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
-//     ) // Key Vault Secrets Officer
-//     principalType: 'ServicePrincipal'
-//   }
-// }
+resource secretPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(virtualMachine.name, 'Key Vault Secrets Officer', keyVault.name)
+  scope: keyVault
+  properties: {
+    principalId: virtualMachine.outputs.systemAssignedMIPrincipalId
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
+    ) // Key Vault Secrets Officer
+    principalType: 'ServicePrincipal'
+  }
+}
 
 // Assign 'Key Vault Crypto User' role to the Disk Encryption Set Managed Identity
 resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
