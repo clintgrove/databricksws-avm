@@ -2,7 +2,7 @@
 param vmpassword string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: 'kv-groove-vmwindbricks2'
+  name: 'kv-groove-vmwindbricks'
   location: 'uksouth'
   properties: {
     sku: {
@@ -34,7 +34,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 }
 
 resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
-  name: 'diskEncryptionvmwindbricks2'
+  name: 'diskEncryptionvmwindbricks'
   location: 'uksouth'
   identity: {
     type: 'SystemAssigned'
@@ -79,7 +79,7 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
   dependsOn: [keyVault, keyPermissions]
-  name: '${uniqueString(deployment().name, 'uksouth')}-test-vmwindbricks2'
+  name: '${uniqueString(deployment().name, 'uksouth')}-test-vmwindbricks'
   params: {
     // Required parameters
     adminUsername: 'localAdminUser'
@@ -93,7 +93,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
     managedIdentities: {
       systemAssigned: true
     }
-    name: 'vmwindbricks2'
+    name: 'vmwindbricks'
     nicConfigurations: [
       {
         ipConfigurations: [
