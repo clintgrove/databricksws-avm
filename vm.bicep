@@ -51,14 +51,14 @@ resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
 }
 
 resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault::key.id, 'Key Vault Crypto Officer', diskEncryptionSet.id)
+  name: guid(keyVault::key.id, 'Key Vault Crypto User', diskEncryptionSet.id)
   scope: keyVault
   properties: {
     principalId: diskEncryptionSet.identity.principalId
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
-      '14b46e9e-c2b7-41b4-b07b-48a6ebf60603'
-    ) // Key Vault Crypto Officer
+      'e147488a-f6f5-4113-8e2d-b22465e65bf6'
+    ) // Key Vault Crypto Service Encryption User
     principalType: 'ServicePrincipal'
   }
 }
@@ -117,6 +117,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.5.0' = {
       diskSizeGB: 128
       managedDisk: {
         storageAccountType: 'Premium_LRS'
+        diskEncryptionSetResourceId: diskEncryptionSet.id
         diskEncryptionSet: {
           id: diskEncryptionSet.id
         }
