@@ -25,12 +25,12 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       kty: 'RSA'
     }
   }
-  resource secret 'secrets@2023-07-01' = {
-    name: 'vmpassword-fromgithubactions-tokeyvault'
-    properties: {
-      value: vmpassword
-    }
-  }
+  // resource secret 'secrets@2023-07-01' = {
+  //   name: 'vmpassword-fromgithubactions-tokeyvault'
+  //   properties: {
+  //     value: vmpassword
+  //   }
+  // }
 }
 
 
@@ -52,29 +52,30 @@ resource diskEncryptionSet 'Microsoft.Compute/diskEncryptionSets@2021-04-01' = {
 }
 
 
-resource secretPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault::secret.id, 'Key Vault Secret Officer', diskEncryptionSet.id)
-  scope: keyVault
-  properties: {
-    principalId: virtualMachine.outputs.systemAssignedMIPrincipalId
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
-    ) // Key Vault Secrets Officer
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource secretPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(keyVault::secret.id, 'Key Vault Secret Officer', diskEncryptionSet.id)
+//   scope: keyVault
+//   properties: {
+//     principalId: virtualMachine.outputs.systemAssignedMIPrincipalId
+//     roleDefinitionId: subscriptionResourceId(
+//       'Microsoft.Authorization/roleDefinitions',
+//       'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
+//     ) // Key Vault Secrets Officer
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 // Assign 'Key Vault Crypto User' role to the Disk Encryption Set Managed Identity
 resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(diskEncryptionSet.id, 'Key Vault Crypto User')
+  name: guid(keyVault::key.id, 'Key Vault Crypto User', diskEncryptionSet.id)
   scope: keyVault
   properties: {
+    principalId: diskEncryptionSet.identity.principalId
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
-       '14b46b3e-83a7-4fb0-b7a1-6c8e9e5d8584'
-       ) // Key Vault Crypto User
-    principalId: diskEncryptionSet.identity.principalId
+      'e147488a-f6f5-4113-8e2d-b22465e65bf6'
+    ) // Key Vault Crypto Service Encryption User
+    principalType: 'ServicePrincipal'
   }
 }
 
