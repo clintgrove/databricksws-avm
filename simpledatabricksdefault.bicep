@@ -47,5 +47,4 @@ module datafactory 'br/public:avm/res/data-factory/factory:0.3.3' = {
      }
     ]
   }
-
 }
