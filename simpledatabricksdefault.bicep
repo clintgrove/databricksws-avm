@@ -34,7 +34,6 @@ module datafactory 'br/public:avm/res/data-factory/factory:0.3.3' = {
   params: {
     location: 'uksouth'
     name: 'defaultadf2323'
-  managedVirtualNetworkName: 'default'
   integrationRuntimes: [
     {
       managedVirtualNetworkName: 'default'
