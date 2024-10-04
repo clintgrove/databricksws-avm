@@ -1,8 +1,10 @@
 @secure()
 param vmpassword string
 
+param uniqueStringSuffix string = uniqueString(resourceGroup().id)
+
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: 'kv-groove-cvmwinmin'
+  name: 'kv56-${uniqueStringSuffix}'
   location: 'uksouth'
   properties: {
     sku: {
