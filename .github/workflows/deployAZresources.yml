@@ -20,8 +20,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@main
 
-      - name: Set up Azure credentials
-        uses: azure/login@v1
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -47,8 +47,8 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@main
 
-        - name: Set up Azure credentials
-          uses: azure/login@v1
+        - name: Azure Login
+          uses: Azure/login@v2.2.0
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -73,8 +73,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@main
 
-      - name: Set up Azure credentials
-        uses: azure/login@v1
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
