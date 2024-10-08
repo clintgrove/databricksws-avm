@@ -1,4 +1,5 @@
 param privateDnsZoneName string = 'privatelink.dfs.core.windows.net'
+
 module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-storageaccount-deploy'
   params: {
@@ -110,7 +111,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
       {
         name: 'stg-dfs-private-endpoint'
         privateDnsZoneResourceIds: [
-          '/subscriptions/3ab181cd-675b-4b59-a974-db22e4177daf/resourceGroups/dbr-private-rg-1/providers/Microsoft.Network/privateDnsZones/privatelink.dfs.core.windows.net'
+          resourceId('Microsoft.Network/privateDnsZones', privateDnsZoneName)
         ]
         service: 'dfs'
         subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'defaultSubnet')
@@ -129,9 +130,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
   }
 }
 
-
 module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
-
   name: '${uniqueString(deployment().name, 'uksouth')}-dfs-pvdnszone'
   params: {
     name: privateDnsZoneName
