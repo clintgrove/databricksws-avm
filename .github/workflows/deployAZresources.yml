@@ -36,7 +36,7 @@ jobs:
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: ${{ secrets.AZURE_RG }}
+          resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./main.bicep
           parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
           failOnStdErr: false
@@ -68,7 +68,7 @@ jobs:
       - name: VM Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: ${{ secrets.AZURE_RG }}
+          resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./vm.bicep
           parameters: 'vmpassword=${{ steps.get-secret.outputs.VM_PASSWORD }}'
           failOnStdErr: false
@@ -95,6 +95,6 @@ jobs:
       - name: Storage Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: ${{ secrets.AZURE_RG }}
+          resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./storage.bicep
           failOnStdErr: false
