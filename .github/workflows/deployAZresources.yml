@@ -10,17 +10,12 @@ on:
         description: 'Parameter for new or existing VNET'
         required: true
         default: existing
-      deployTarget:
-        description: 'Choose which resource to deploy: databricks, vm, or storage'
-        required: true
-        default: databricks
 
 env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
 
 jobs:
   deploy-databricks:
-    if: ${{ github.event.inputs.deployTarget == 'databricks' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -47,7 +42,6 @@ jobs:
           failOnStdErr: false
 
   deploy-vm:
-    if: ${{ github.event.inputs.deployTarget == 'vm' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -65,7 +59,7 @@ jobs:
       - name: Get secret from Key Vault
         id: get-secret
         run: |
-          KV_VM_PASSWORD=$(az keyvault secret show --name kv-vmpassword --vault-name kv-fiftysix-general1 --query value -o tsv)
+          KV_VM_PASSWORD=$(az keyvault secret show --name kv-vmpassword --vault-name ${{ env.CI_KEY_VAULT_NAME }} --query value -o tsv)
           echo "::set-output name=VM_PASSWORD::$KV_VM_PASSWORD"
           echo "::add-mask::$KV_VM_PASSWORD"
           echo "VM Password fetched from Key Vault."
@@ -80,7 +74,6 @@ jobs:
 
 
   deploy-storage:
-    if: ${{ github.event.inputs.deployTarget == 'storage' }}
     runs-on: ubuntu-latest
 
     steps:
