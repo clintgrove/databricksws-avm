@@ -71,7 +71,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
       sku: '2022-datacenter-azure-edition'
       version: 'latest'
     }
-    name: 'cvmwinmin2'
+    name: 'cvmwinmin'
     nicConfigurations: [
       {
         ipConfigurations: [
