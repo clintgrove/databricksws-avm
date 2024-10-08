@@ -118,12 +118,12 @@ module publicIpAddress 'br/public:avm/res/network/public-ip-address:0.2.2' = {
   }
 }
 
-// module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
-//   name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
-//   params: {
-//     name: 'bastionhostdbr1'
-//     vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
-//     location: 'uksouth'
-//     bastionSubnetPublicIpResourceId: publicIpAddress.outputs.resourceId
-//   }
-// }
+module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
+  name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
+  params: {
+    name: 'bastionhostdbr1'
+    vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
+    location: 'uksouth'
+    bastionSubnetPublicIpResourceId: publicIpAddress.outputs.resourceId
+  }
+}
