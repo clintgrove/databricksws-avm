@@ -69,7 +69,7 @@ jobs:
           InlineScript: |
             $KV_VM_PASSWORD = az keyvault secret show --name kv-vmpassword --vault-name kv-fiftysix-general1 --query value -o tsv
             echo "##vso[task.setvariable variable=KV_VM_PASSWORD;issecret=true]$KV_VM_PASSWORD"  
-            
+
       # - name: Get secret from Key Vault
       #   id: get-secret
       #   uses: azure/secrets@v1
@@ -77,8 +77,8 @@ jobs:
       #     keyvault: kv-fiftysix-general1
       #     secret: kv-vmpassword
 
-      - name: Set VM password
-        run: echo "##vso[task.setvariable variable=KV_VM_PASSWORD]${{ steps.get-secret.outputs.secret }}"
+      # - name: Set VM password
+      #   run: echo "##vso[task.setvariable variable=KV_VM_PASSWORD]${{ steps.get-secret.outputs.secret }}"
 
       - name: VM Deploy Bicep file
         uses: azure/arm-deploy@v1
