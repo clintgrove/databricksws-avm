@@ -11,16 +11,16 @@ on:
         required: true
         default: existing
       deployTarget:
-        description: 'Choose which resources to deploy: databricks, vm, storage (comma-separated if multiple)'
+        description: 'Choose which resource to deploy: databricks, vm, or storage'
         required: true
-        default: databricks,vm,storage  # Default to deploying all resources
+        default: databricks
 
 env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
 
 jobs:
   deploy-databricks:
-    if: contains(fromJson('["${{ github.event.inputs.deployTarget }}"]'), 'databricks')
+    if: ${{ github.event.inputs.deployTarget == 'databricks' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +35,7 @@ jobs:
       - name: Set Azure subscription context
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
-      - name: Create Resource Group
+      - name: CreateRG
         run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
 
       - name: Databricks Deploy Bicep file
@@ -47,7 +47,7 @@ jobs:
           failOnStdErr: false
 
   deploy-vm:
-    if: contains(fromJson('["${{ github.event.inputs.deployTarget }}"]'), 'vm')
+    if: ${{ github.event.inputs.deployTarget == 'vm' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -78,8 +78,9 @@ jobs:
           parameters: 'vmpassword=${{ steps.get-secret.outputs.VM_PASSWORD }}'
           failOnStdErr: false
 
+
   deploy-storage:
-    if: contains(fromJson('["${{ github.event.inputs.deployTarget }}"]'), 'storage')
+    if: ${{ github.event.inputs.deployTarget == 'storage' }}
     runs-on: ubuntu-latest
 
     steps:
