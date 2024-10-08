@@ -10,10 +10,17 @@ on:
         description: 'Parameter for new or existing VNET'
         required: true
         default: existing
+      deployTarget:
+        description: 'Choose which resource to deploy: databricks, vm, or storage'
+        required: true
+        default: databricks
 
+env:
+  CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
 
 jobs:
   deploy-databricks:
+    if: ${{ github.event.inputs.deployTarget == 'databricks' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -40,36 +47,44 @@ jobs:
           failOnStdErr: false
 
   deploy-vm:
-        runs-on: ubuntu-latest
-        needs:  deploy-databricks
+    if: ${{ github.event.inputs.deployTarget == 'vm' }}
+    runs-on: ubuntu-latest
 
-        steps:
-        - name: Checkout code
-          uses: actions/checkout@main
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
 
-        - name: Azure Login
-          uses: Azure/login@v2.2.0
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-        - name: Set Azure subscription context
-          run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+      - name: Set Azure subscription context
+        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
-        - name: VM Deploy Bicep file
-          uses: azure/arm-deploy@v1
-          with:
-            resourceGroupName: ${{ secrets.AZURE_RG }}
-            template: ./vm.bicep
-            parameters: 'vmpassword=${{ secrets.VM_PASSWORD }}'
-            failOnStdErr: false
+      - name: Get secret from Key Vault
+        id: get-secret
+        uses: azure/secrets@v1
+        with:
+          keyvault: kv-fiftysix-general1
+          secret: kv-vmpassword
+
+      - name: Set VM password
+        run: echo "##vso[task.setvariable variable=KV_VM_PASSWORD]${{ steps.get-secret.outputs.secret }}"
+
+      - name: VM Deploy Bicep file
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: ${{ secrets.AZURE_RG }}
+          template: ./vm.bicep
+          parameters: 'vmpassword=${{ secrets.KV_VM_PASSWORD }}'
+          failOnStdErr: false
 
   deploy-storage:
-      runs-on: ubuntu-latest
-      needs:  
-        - deploy-databricks
-        - deploy-vm
+    if: ${{ github.event.inputs.deployTarget == 'storage' }}
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
       - name: Checkout code
         uses: actions/checkout@main
 
@@ -84,6 +99,6 @@ jobs:
       - name: Storage Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-         resourceGroupName: ${{ secrets.AZURE_RG }}
-         template: ./storage.bicep
-         failOnStdErr: false
+          resourceGroupName: ${{ secrets.AZURE_RG }}
+          template: ./storage.bicep
+          failOnStdErr: false
