@@ -2,9 +2,6 @@
 
 This repository contains a pattern of bicep modules from the https://aka.ms/avm (or go directly to https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/databricks/workspace)
 
-**On first deployment. You will have to reset the Virtual Machines admin password. You can do this under the "Connect" tab
-Then log in with the Bastion tab on the VM.**
-
 Once you have logged into the VM, navigate go to https://accounts.azuredatabricks.net
 
 (You will be able to log in if you have owner on the Resource Group that databricks was deployed into)
@@ -12,7 +9,6 @@ Once you have logged into the VM, navigate go to https://accounts.azuredatabrick
 You must now add yourself and others to the Workspace/xxxx/Permissions tab as either a databricks user or admin
 
 Once done, you can open the Azure databricks workspace, the link can be found in the Workspaces tab of the Accounts website that you are logged into
-
 
 The basic deployment of Databricks with its virtual networks
 - Databricks workspace   
@@ -33,6 +29,16 @@ The Virtual Machine
 Steps 
 
 #### Deployment
+
+# KeyVault for VM password
+
+I have designed this deployment to use KeyVault to store the VM password, that way you can control what that password is. This is how you can do it yourself. 
+### 1. Create a keyvault
+- Create keyvault in Azure, give it any name you want.
+- Store a password for your VM in a secret named "kv-vmpassword"
+- Give your Service principal that you have set up in
+
+  
 Clone or Fork this repository
 Go to GitHub actions once you forked/cloned. Then add these secrets as you can see in the screenshot
 
