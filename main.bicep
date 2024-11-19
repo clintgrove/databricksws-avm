@@ -157,8 +157,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
     ]
   }
 }
-
-module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
+module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
   dependsOn: [
     vnetwork
     nsg
@@ -183,9 +182,14 @@ module workspace 'br/public:avm/res/databricks/workspace:0.1.0' = {
     vnetAddressPrefix: vnetAddressPrefixParam
     privateEndpoints: [
       {
-        privateDnsZoneResourceIds: [
-          privateDnsZone.outputs.resourceId
-        ]
+        privateDnsZoneGroup: {
+          privateDnsZoneGroupConfigs: [
+            {
+              privateDnsZoneResourceId: privateDnsZone.outputs.resourceId
+            }
+          ]
+        }
+        service: 'databricks_ui_api'
         subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
         tags: {
           Environment: 'Non-Prod'
