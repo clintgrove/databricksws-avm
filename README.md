@@ -21,9 +21,10 @@ Steps
 
 # Deployment
 
-## KeyVault for VM password
+## Use a KeyVault for VM password
 
 I have designed this deployment to use KeyVault to store the VM password, that way you can control what that password is. This is how you can do it yourself. 
+
 ## 1. Create a keyvault
 - Create keyvault in Azure, give it any name you want. I have a Key Vault that is stand alone for these purposes, to store secrets for deployments. 
 - Store a password for your VM in a secret named "kv-vmpassword".
@@ -32,7 +33,7 @@ I have designed this deployment to use KeyVault to store the VM password, that w
 
 <img width="1001" alt="image" src="https://github.com/user-attachments/assets/0aa363fc-67a1-43e6-bf31-5193e20aa798">
 
-## 1. Clone or Fork this repository and add secrets in the Settings tab
+## 2. Clone or Fork this repository and add secrets in the Settings tab
 
 Clone or Fork from this GitHub repository.
 
@@ -48,7 +49,7 @@ Now store your credentials in GitHub actions
 
 <img width="1001" alt="image" src="image.png" style="border: 2px solid black;">
 
-## 1. Run the deployment 
+## 3. Run the deployment 
 The first time that you run this deployment, you must be set the network to **"new"** for the vnetAddressPrefixParam paramter. This will deploy a new virtual network. Every other subsequent deployment must have this parameter set to **"existing"**
 
 ![image](https://github.com/clintgrove/databricksws-avm/assets/30802291/2d240af2-9d27-4fbb-8ea0-04c4f5cbace1)
