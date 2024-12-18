@@ -54,6 +54,9 @@ The first time that you run this deployment, you must be set the network to **"n
 
 ![image](https://github.com/clintgrove/databricksws-avm/assets/30802291/2d240af2-9d27-4fbb-8ea0-04c4f5cbace1)
 
+
+## 4. Using the VM navigate to Databricks and set up user access
+
 Once you have logged into the VM, navigate go to https://accounts.azuredatabricks.net
 
 (You will be able to log in if you have owner on the Resource Group that databricks was deployed into)
