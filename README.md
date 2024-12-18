@@ -25,15 +25,17 @@ Steps
 
 I have designed this deployment to use KeyVault to store the VM password, that way you can control what that password is. This is how you can do it yourself. 
 ### 1. Create a keyvault
-- Create keyvault in Azure, give it any name you want.
-- Store a password for your VM in a secret named "kv-vmpassword"
-- Give your Service principal that you have set up in step 3 at least Key Vault Secret User role
-- Save your Key Vault name in the GitHub Actions Secret and Variables/Actions/Variables area
-- 
+- Create keyvault in Azure, give it any name you want. I have a Key Vault that is stand alone for these purposes, to store secrets for deployments. 
+- Store a password for your VM in a secret named "kv-vmpassword".
+- Give your Service principal that you will set up in step 3 at least Key Vault Secret User role.
+- Save your Key Vault **name** in the GitHub Actions Secret and Variables/Actions/Variables area. (See below where to save it)
+
 <img width="1001" alt="image" src="https://github.com/user-attachments/assets/0aa363fc-67a1-43e6-bf31-5193e20aa798">
 
 ### 2. Clone or Fork this repository
 Go to GitHub actions once you forked/cloned. Then add these secrets as you can see in the screenshot
+
+![Secrets to save in your Actions area in Settings](image.png)
 
 ### 3. Create credentials
 
