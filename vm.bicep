@@ -3,6 +3,9 @@ param vmpassword string
 
 param uniqueStringSuffix string = uniqueString(resourceGroup().id)
 
+// Define the OS disk name
+var osDiskName = 'cvmwinmin-disk-os-01'
+
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: 'kv56-${uniqueStringSuffix}'
   location: 'uksouth'
@@ -12,7 +15,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       name: 'standard'
     }
     tenantId: tenant().tenantId
-    enablePurgeProtection: true // Required for encryption to work
+    enablePurgeProtection: true
     softDeleteRetentionInDays: 7
     enabledForTemplateDeployment: true
     enabledForDiskEncryption: true
@@ -59,8 +62,14 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
-resource osDisk 'Microsoft.Compute/disks@2021-04-01' = {
-  name: 'cvmwinmin-disk-os-01'
+// Reference the existing OS disk if it exists
+resource existingOsDisk 'Microsoft.Compute/disks@2021-04-01' existing = {
+  name: osDiskName
+}
+
+// Create a new OS disk if it does not exist
+resource newOsDisk 'Microsoft.Compute/disks@2021-04-01' = if (empty(existingOsDisk.id)) {
+  name: osDiskName
   location: 'uksouth'
   sku: {
     name: 'Premium_LRS'
@@ -76,10 +85,11 @@ resource osDisk 'Microsoft.Compute/disks@2021-04-01' = {
   }
 }
 
+// Determine the disk ID to use
+var osDiskId = empty(existingOsDisk.id) ? newOsDisk.id : existingOsDisk.id 
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
-    // Required parameters
     adminUsername: 'localAdminUser'
     encryptionAtHost: false
     imageReference: {
@@ -101,7 +111,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
       }
     ]
     osDisk: {
-      id: osDisk.id
+      id: osDiskId
     }
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
@@ -112,33 +122,10 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
         managedDisk: {
           storageAccountType: 'Premium_LRS'
           diskEncryptionSet: {
-            id:  diskEncryptionSet.id
+            id: diskEncryptionSet.id
           }
         }
       }
     ]
-  }
-}
-
-module publicIpAddress 'br/public:avm/res/network/public-ip-address:0.2.2' = {
-  name: '${uniqueString(deployment().name, 'uksouth')}-public-ip'
-  params: {
-    name: 'bastionhostdbr1-pip'
-    location: 'uksouth'
-  }
-}
-
-output resourceId string = resourceId('Microsoft.Network/publicIPAddresses', 'bastionhostdbr1-pip')
-
-module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
-  dependsOn: [
-    publicIpAddress
-  ]
-  name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
-  params: {
-    name: 'bastionhostdbr1'
-    vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
-    location: 'uksouth'
-    bastionSubnetPublicIpResourceId: publicIpAddress.outputs.resourceId
   }
 }
