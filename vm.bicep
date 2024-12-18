@@ -87,9 +87,25 @@ resource newOsDisk 'Microsoft.Compute/disks@2021-04-01' = if (empty(existingOsDi
 
 // Determine the disk ID to use
 var osDiskReference = empty(existingOsDisk.id) ? {
-  id: newOsDisk.id
+  caching: 'ReadWrite'
+  diskSizeGB: 128
+  managedDisk: {
+    storageAccountType: 'Premium_LRS'
+    diskEncryptionSet: {
+      id: diskEncryptionSet.id
+    }
+  }
+  createOption: 'Attach'
 } : {
   id: existingOsDisk.id
+  caching: 'ReadWrite'
+  diskSizeGB: 128
+  managedDisk: {
+    storageAccountType: 'Standard_LRS'
+    diskEncryptionSet: {
+      id: diskEncryptionSet.id
+    }
+  }
 }
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'

@@ -33,13 +33,13 @@ jobs:
       - name: CreateRG
         run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
 
-      - name: Databricks Deploy Bicep file
-        uses: azure/arm-deploy@v1
-        with:
-          resourceGroupName: ${{ github.event.inputs.paramRG }}
-          template: ./main.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
-          failOnStdErr: false
+      # - name: Databricks Deploy Bicep file
+      #   uses: azure/arm-deploy@v1
+      #   with:
+      #     resourceGroupName: ${{ github.event.inputs.paramRG }}
+      #     template: ./main.bicep
+      #     parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
+      #     failOnStdErr: false
 
   deploy-vm:
     runs-on: ubuntu-latest
