@@ -62,6 +62,9 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 resource osDisk 'Microsoft.Compute/disks@2021-04-01' = {
   name: 'cvmwinmin-disk-os-01'
   location: 'uksouth'
+  sku: {
+    name: 'Premium_LRS'
+  }
   properties: {
     creationData: {
       createOption: 'Empty'
@@ -69,9 +72,6 @@ resource osDisk 'Microsoft.Compute/disks@2021-04-01' = {
     diskSizeGB: 128
     encryption: {
       diskEncryptionSetId: diskEncryptionSet.id
-    }
-    sku: {
-      name: 'Premium_LRS'
     }
   }
 }
