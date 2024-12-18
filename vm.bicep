@@ -86,10 +86,15 @@ resource newOsDisk 'Microsoft.Compute/disks@2021-04-01' = if (empty(existingOsDi
 }
 
 // Determine the disk ID to use
-var osDiskId = empty(existingOsDisk.id) ? newOsDisk.id : existingOsDisk.id 
+var osDiskReference = empty(existingOsDisk.id) ? {
+  id: newOsDisk.id
+} : {
+  id: existingOsDisk.id
+}
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
+    osDisk: osDiskReference
     adminUsername: 'localAdminUser'
     encryptionAtHost: false
     imageReference: {
@@ -110,9 +115,6 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
         nicSuffix: '-nic-01'
       }
     ]
-    osDisk: {
-      id: osDiskId
-    }
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
     adminPassword: vmpassword
