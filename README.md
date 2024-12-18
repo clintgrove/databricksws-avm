@@ -35,7 +35,8 @@ I have designed this deployment to use KeyVault to store the VM password, that w
 ### 2. Clone or Fork this repository
 Go to GitHub actions once you forked/cloned. Then add these secrets as you can see in the screenshot
 
-![Secrets to save in your Actions area in Settings](image.png)
+<img width="1001" alt="image" src="image.png">
+
 
 ### 3. Create credentials
 
