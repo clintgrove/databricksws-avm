@@ -107,10 +107,12 @@ var osDiskReference = empty(existingOsDisk.id) ? {
     }
   }
 }
+
+output osDiskId string = osDiskReference.id
+output existingOsDiskId bool = empty(existingOsDisk.id)
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
-    osDisk: osDiskReference
     adminUsername: 'localAdminUser'
     encryptionAtHost: false
     imageReference: {
@@ -134,11 +136,21 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
     adminPassword: vmpassword
+    osDisk: {
+      caching: 'ReadWrite'
+      diskSizeGB: '128'
+      managedDisk: {
+        storageAccountType: 'Standard_LRS'
+        diskEncryptionSet: {
+          id: diskEncryptionSet.id
+        }
+      }
+    }
     dataDisks: [
       {
         diskSizeGB: 128
         managedDisk: {
-          storageAccountType: 'Premium_LRS'
+          storageAccountType: 'Standard_LRS'
           diskEncryptionSet: {
             id: diskEncryptionSet.id
           }
