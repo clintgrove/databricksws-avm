@@ -32,7 +32,7 @@ I have designed this deployment to use KeyVault to store the VM password, that w
 
 <img width="1001" alt="image" src="https://github.com/user-attachments/assets/0aa363fc-67a1-43e6-bf31-5193e20aa798">
 
-## 2. Clone or Fork this repository and add secrets in the Settings tab
+## 1. Clone or Fork this repository and add secrets in the Settings tab
 
 Clone or Fork from this GitHub repository.
 
@@ -48,7 +48,7 @@ Now store your credentials in GitHub actions
 
 <img width="1001" alt="image" src="image.png" style="border: 2px solid black;">
 
-## 4. Run the deployment 
+## 1. Run the deployment 
 The first time that you run this deployment, you must be set the network to **"new"** for the vnetAddressPrefixParam paramter. This will deploy a new virtual network. Every other subsequent deployment must have this parameter set to **"existing"**
 
 ![image](https://github.com/clintgrove/databricksws-avm/assets/30802291/2d240af2-9d27-4fbb-8ea0-04c4f5cbace1)
@@ -60,7 +60,3 @@ Once you have logged into the VM, navigate go to https://accounts.azuredatabrick
 You must now add yourself and others to the Workspace/xxxx/Permissions tab as either a databricks user or admin
 
 Once done, you can open the Azure databricks workspace, the link can be found in the Workspaces tab of the Accounts website that you are logged into
-
-#TODO
-#### access and permissions
-##### Private endpoints and DNS zones
