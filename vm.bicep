@@ -59,6 +59,23 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
+resource osDisk 'Microsoft.Compute/disks@2021-04-01' = {
+  name: 'cvmwinmin-disk-os-01'
+  location: 'uksouth'
+  properties: {
+    creationData: {
+      createOption: 'Empty'
+    }
+    diskSizeGB: 128
+    encryption: {
+      diskEncryptionSetId: diskEncryptionSet.id
+    }
+    sku: {
+      name: 'Premium_LRS'
+    }
+  }
+}
+
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
@@ -84,14 +101,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
       }
     ]
     osDisk: {
-      caching: 'ReadWrite'
-      diskSizeGB: '128'
-      managedDisk: {
-        storageAccountType: 'Premium_LRS'
-        diskEncryptionSet: {
-          id: diskEncryptionSet.id
-        }
-      }
+      id: osDisk.id
     }
     osType: 'Windows'
     vmSize: 'Standard_DS2_v2'
