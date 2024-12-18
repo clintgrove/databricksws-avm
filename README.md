@@ -32,7 +32,7 @@ I have designed this deployment to use KeyVault to store the VM password, that w
 
 <img width="1001" alt="image" src="https://github.com/user-attachments/assets/0aa363fc-67a1-43e6-bf31-5193e20aa798">
 
-### 2. Clone or Fork this repository
+### 2. Clone or Fork this repository and add secrets in the Settings tab
 Go to GitHub actions once you forked/cloned. Then add these secrets as you can see in the screenshot
 
 <img width="1001" alt="image" src="image.png" style="border: 2px solid black;">
