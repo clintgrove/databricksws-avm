@@ -3,9 +3,6 @@ param vmpassword string
 
 param uniqueStringSuffix string = uniqueString(resourceGroup().id)
 
-// Define the OS disk name
-var osDiskName = 'cvmwinmin-disk-os-01'
-
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: 'kv56-${uniqueStringSuffix}'
   location: 'uksouth'
@@ -62,54 +59,6 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
-// Reference the existing OS disk if it exists
-resource existingOsDisk 'Microsoft.Compute/disks@2021-04-01' existing = {
-  name: osDiskName
-}
-
-// Create a new OS disk if it does not exist
-resource newOsDisk 'Microsoft.Compute/disks@2021-04-01' = if (empty(existingOsDisk.id)) {
-  name: osDiskName
-  location: 'uksouth'
-  sku: {
-    name: 'Premium_LRS'
-  }
-  properties: {
-    creationData: {
-      createOption: 'Empty'
-    }
-    diskSizeGB: 128
-    encryption: {
-      diskEncryptionSetId: diskEncryptionSet.id
-    }
-  }
-}
-
-// Determine the disk ID to use
-var osDiskReference = empty(existingOsDisk.id) ? {
-  caching: 'ReadWrite'
-  diskSizeGB: 128
-  managedDisk: {
-    storageAccountType: 'Premium_LRS'
-    diskEncryptionSet: {
-      id: diskEncryptionSet.id
-    }
-  }
-  createOption: 'Attach'
-} : {
-  id: existingOsDisk.id
-  caching: 'ReadWrite'
-  diskSizeGB: 128
-  managedDisk: {
-    storageAccountType: 'Standard_LRS'
-    diskEncryptionSet: {
-      id: diskEncryptionSet.id
-    }
-  }
-}
-
-output osDiskId string = osDiskReference.id
-output existingOsDiskId bool = empty(existingOsDisk.id)
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
