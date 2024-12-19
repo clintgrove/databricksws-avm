@@ -10,13 +10,37 @@ on:
         description: 'Parameter for new or existing VNET'
         required: true
         default: existing
+      deployDatabricks:
+        description: 'Deploy Databricks'
+        required: true
+        type: boolean
+        default: true
+      deployVM:
+        description: 'Deploy VM'
+        required: true
+        type: boolean
+        default: true
+      deployStorage:
+        description: 'Deploy Storage Account'
+        required: true
+        type: boolean
+        default: true
 
 env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
 
 jobs:
-  deploy-databricks:
+  deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - job: deploy-databricks
+            condition: ${{ github.event.inputs.deployDatabricks == 'true' }}
+          - job: deploy-vm
+            condition: ${{ github.event.inputs.deployVM == 'true' }}
+          - job: deploy-storage
+            condition: ${{ github.event.inputs.deployStorage == 'true' }}
 
     steps:
       - name: Checkout code
@@ -33,7 +57,8 @@ jobs:
       - name: CreateRG
         run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
 
-      - name: Databricks Deploy Bicep file
+      - name: Deploy Databricks Bicep file
+        if: matrix.job == 'deploy-databricks'
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
@@ -41,23 +66,8 @@ jobs:
           parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
           failOnStdErr: false
 
-  deploy-vm:
-    runs-on: ubuntu-latest
-    needs: deploy-databricks
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@main
-
-      - name: Azure Login
-        uses: Azure/login@v2.2.0
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set Azure subscription context
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
-
       - name: Get secret from Key Vault
+        if: matrix.job == 'deploy-vm'
         id: get-secret
         run: |
           KV_VM_PASSWORD=$(az keyvault secret show --name kv-vmpassword --vault-name ${{ env.CI_KEY_VAULT_NAME }} --query value -o tsv)
@@ -65,7 +75,8 @@ jobs:
           echo "::add-mask::$KV_VM_PASSWORD"
           echo "VM Password fetched from Key Vault."
 
-      - name: VM Deploy Bicep file
+      - name: Deploy VM Bicep file
+        if: matrix.job == 'deploy-vm'
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
@@ -73,26 +84,8 @@ jobs:
           parameters: 'vmpassword=${{ steps.get-secret.outputs.VM_PASSWORD }}'
           failOnStdErr: false
 
-
-  deploy-storage:
-    runs-on: ubuntu-latest
-    needs:  
-    - deploy-databricks
-    - deploy-vm
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@main
-
-      - name: Azure Login
-        uses: Azure/login@v2.2.0
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set Azure subscription context
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
-
-      - name: Storage Deploy Bicep file
+      - name: Deploy Storage Bicep file
+        if: matrix.job == 'deploy-storage'
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
