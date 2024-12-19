@@ -61,16 +61,20 @@ jobs:
         id: get-secret
         run: |
           KV_VM_PASSWORD=$(az keyvault secret show --name kv-vmpassword --vault-name ${{ env.CI_KEY_VAULT_NAME }} --query value -o tsv)
-          echo "::set-output name=VM_PASSWORD::$KV_VM_PASSWORD"
+          echo "VM_PASSWORD=$KV_VM_PASSWORD" >> $GITHUB_ENV
           echo "::add-mask::$KV_VM_PASSWORD"
           echo "VM Password fetched from Key Vault."
+      
+      - name: Debug Password
+        run: |
+          echo "Password being passed: ${{ env.VM_PASSWORD }}"
 
       - name: VM Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./vm.bicep
-          parameters: 'vmpassword=${{ steps.get-secret.outputs.VM_PASSWORD }}'
+          parameters: 'vmpassword=${{ env.VM_PASSWORD }}'
           failOnStdErr: false
 
 
