@@ -108,3 +108,24 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
     ]
   }
 }
+
+module publicIpAddress 'br/public:avm/res/network/public-ip-address:0.2.2' = {
+  name: '${uniqueString(deployment().name, 'uksouth')}-public-ip'
+  params: {
+    name: 'bastionhostdbr1-pip'
+    location: 'uksouth'
+  }
+}
+
+module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
+  dependsOn: [
+    publicIpAddress
+  ]
+  name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
+  params: {
+    name: 'bastionhostdbr1'
+    vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
+    location: 'uksouth'
+    bastionSubnetPublicIpResourceId: publicIpAddress.outputs.resourceId
+  }
+}
