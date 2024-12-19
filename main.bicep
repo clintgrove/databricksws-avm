@@ -43,7 +43,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '443'
-          sourceAddressPrefix: 'AzureBastionSubnet' 
+          sourceAddressPrefix: '10.101.129.0/26' //AzureBastionSubnet
           destinationAddressPrefix: '*'
           access: 'Allow'
           priority: 100
