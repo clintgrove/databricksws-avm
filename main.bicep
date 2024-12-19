@@ -1,5 +1,5 @@
 @description('The name of the workspace to create.')
-param workspaceName string = 'dwwaf002'
+param workspaceName string = 'dbr004'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
 
@@ -23,6 +23,34 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
     location: 'uksouth'
     securityRules: [
       {
+        name: 'AllowBastionToVM'
+        properties: {
+          description: 'Allow Azure Bastion to connect to the VM on RDP port 3389.'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '3389'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 101
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'AllowAzureBastionTraffic'
+        properties: {
+          description: 'Allow Azure Bastion service traffic to AzureBastionSubnet.'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: '10.101.129.0/26' //AzureBastionSubnet
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 100
+          direction: 'Inbound'
+        }
+      }
+      {
         name: 'Microsoft.Databricks-workspaces_UseOnly_databricks-worker-to-worker-inbound'
         properties: {
           description: 'Required for worker nodes communication within a cluster.'
@@ -32,7 +60,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
           sourceAddressPrefix: 'VirtualNetwork'
           destinationAddressPrefix: 'VirtualNetwork'
           access: 'Allow'
-          priority: 100
+          priority: 102
           direction: 'Inbound'
         }
       }
@@ -46,7 +74,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
           sourceAddressPrefix: 'VirtualNetwork'
           destinationAddressPrefix: 'AzureDatabricks'
           access: 'Allow'
-          priority: 100
+          priority: 103
           direction: 'Outbound'
         }
       }
@@ -60,7 +88,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
           sourceAddressPrefix: 'VirtualNetwork'
           destinationAddressPrefix: 'Sql'
           access: 'Allow'
-          priority: 101
+          priority: 104
           direction: 'Outbound'
         }
       }
@@ -74,7 +102,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
           sourceAddressPrefix: 'VirtualNetwork'
           destinationAddressPrefix: 'Storage'
           access: 'Allow'
-          priority: 102
+          priority: 105
           direction: 'Outbound'
         }
       }
@@ -88,7 +116,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
           sourceAddressPrefix: 'VirtualNetwork'
           destinationAddressPrefix: 'VirtualNetwork'
           access: 'Allow'
-          priority: 103
+          priority: 106
           direction: 'Outbound'
         }
       }
@@ -102,7 +130,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
           sourceAddressPrefix: 'VirtualNetwork'
           destinationAddressPrefix: 'EventHub'
           access: 'Allow'
-          priority: 104
+          priority: 107
           direction: 'Outbound'
         }
       }
@@ -110,10 +138,8 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
   }
 }
 
+
 module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOrExisting == 'new') {
-  dependsOn: [
-    nsg
-  ]
   name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-vnet'
   params: {
     name: vnetName
@@ -158,10 +184,6 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
   }
 }
 module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
-  dependsOn: [
-    vnetwork
-    nsg
-  ]
   name: '${uniqueString(deployment().name, 'uksouth')}-databricksworkspace'
   params: {
     name: workspaceName
@@ -177,7 +199,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
     requiredNsgRules: 'NoAzureDatabricksRules'
     requireInfrastructureEncryption: true
     skuName: 'premium'
-    storageAccountName: 'dev2${uniqueString(resourceGroup().id)}stg'
+    storageAccountName: '${workspaceName}${uniqueString(resourceGroup().id)}stg'
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: vnetAddressPrefixParam
     privateEndpoints: [
@@ -216,9 +238,6 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
 }
 
 module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
-  dependsOn: [
-    privateDnsZone
-  ]
   name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
   params: {
     name: privateEndpointNameBrowserAuth

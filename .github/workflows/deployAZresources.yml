@@ -60,19 +60,17 @@ jobs:
       - name: Get secret from Key Vault
         id: get-secret
         run: |
-          KV_VM_PASSWORD=$(az keyvault secret show --name kv-vmpassword --vault-name ${{ env.CI_KEY_VAULT_NAME }} --query value -o tsv)
-          echo "::set-output name=VM_PASSWORD::$KV_VM_PASSWORD"
-          echo "::add-mask::$KV_VM_PASSWORD"
-          echo "VM Password fetched from Key Vault."
+          VM_PASSWORD=$(az keyvault secret show --name kv-vmpassword --vault-name ${{ env.CI_KEY_VAULT_NAME }} --query value -o tsv)
+          echo "::add-mask::$VM_PASSWORD"
+          echo "vm_password=$VM_PASSWORD" >> $GITHUB_OUTPUT
 
       - name: VM Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./vm.bicep
-          parameters: 'vmpassword=${{ steps.get-secret.outputs.VM_PASSWORD }}'
+          parameters: 'vmpassword=${{ steps.get-secret.outputs.vm_password }}'
           failOnStdErr: false
-
 
   deploy-storage:
     runs-on: ubuntu-latest

@@ -21,21 +21,21 @@ Steps
 
 # Deployment
 
-## KeyVault for VM password
+## Use a KeyVault for VM password
 
 I have designed this deployment to use KeyVault to store the VM password, that way you can control what that password is. This is how you can do it yourself. 
-### 1. Create a keyvault
-- Create keyvault in Azure, give it any name you want.
-- Store a password for your VM in a secret named "kv-vmpassword"
-- Give your Service principal that you have set up in step 3 at least Key Vault Secret User role
-- Save your Key Vault name in the GitHub Actions Secret and Variables/Actions/Variables area
-- 
+
+## 1. Create a keyvault
+- Create keyvault in Azure, give it any name you want. I have a Key Vault that is stand alone for these purposes, to store secrets for deployments. 
+- Store a password for your VM in a secret named "kv-vmpassword".
+- Give your Service principal that you will set up in step 3 at least Key Vault Secret User role.
+- Save your Key Vault **name** in the GitHub Actions Secret and Variables/Actions/Variables area. (See below where to save it)
+
 <img width="1001" alt="image" src="https://github.com/user-attachments/assets/0aa363fc-67a1-43e6-bf31-5193e20aa798">
 
-### 2. Clone or Fork this repository
-Go to GitHub actions once you forked/cloned. Then add these secrets as you can see in the screenshot
+## 2. Clone or Fork this repository and add secrets in the Settings tab
 
-### 3. Create credentials
+Clone or Fork from this GitHub repository.
 
 To create the secret called AZURE_CREDENTIALS you need to make a service principal, like this 
 
@@ -43,16 +43,19 @@ To create the secret called AZURE_CREDENTIALS you need to make a service princip
 
 You can find out more on this page https://learn.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=userlevel%2Caspnetcore
 
-Give your new Service Principal Contributor and User Access Adminstrator rights in RBAC on your subscription. 
+Give your new Service Principal `Contributor` and `User Access Adminstrator` rights in RBAC on your subscription. You can do it at Resource group level I think, but make sure you name the Resource group the same name as what is in the deployment 
 
 Now store your credentials in GitHub actions
 
-![image](https://github.com/clintgrove/databricksws-avm/assets/30802291/2c6d3ca5-22ca-4c05-a985-34370c7e04ce)
+<img width="1001" alt="image" src="image.png" style="border: 2px solid black;">
 
-### 4. Run the deployment 
+## 3. Run the deployment 
 The first time that you run this deployment, you must be set the network to **"new"** for the vnetAddressPrefixParam paramter. This will deploy a new virtual network. Every other subsequent deployment must have this parameter set to **"existing"**
 
 ![image](https://github.com/clintgrove/databricksws-avm/assets/30802291/2d240af2-9d27-4fbb-8ea0-04c4f5cbace1)
+
+
+## 4. Using the VM navigate to Databricks and set up user access
 
 Once you have logged into the VM, navigate go to https://accounts.azuredatabricks.net
 
@@ -61,7 +64,3 @@ Once you have logged into the VM, navigate go to https://accounts.azuredatabrick
 You must now add yourself and others to the Workspace/xxxx/Permissions tab as either a databricks user or admin
 
 Once done, you can open the Azure databricks workspace, the link can be found in the Workspaces tab of the Accounts website that you are logged into
-
-#TODO
-#### access and permissions
-##### Private endpoints and DNS zones

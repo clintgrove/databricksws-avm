@@ -12,7 +12,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       name: 'standard'
     }
     tenantId: tenant().tenantId
-    enablePurgeProtection: true // Required for encryption to work
+    enablePurgeProtection: true
     softDeleteRetentionInDays: 7
     enabledForTemplateDeployment: true
     enabledForDiskEncryption: true
@@ -62,7 +62,6 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-test-cvmwinmin'
   params: {
-    // Required parameters
     adminUsername: 'localAdminUser'
     encryptionAtHost: false
     imageReference: {
@@ -83,26 +82,26 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
         nicSuffix: '-nic-01'
       }
     ]
+    osType: 'Windows'
+    vmSize: 'Standard_DS2_v2'
+    adminPassword: vmpassword
     osDisk: {
       caching: 'ReadWrite'
       diskSizeGB: '128'
       managedDisk: {
-        storageAccountType: 'Premium_LRS'
+        storageAccountType: 'Standard_LRS'
         diskEncryptionSet: {
           id: diskEncryptionSet.id
         }
       }
     }
-    osType: 'Windows'
-    vmSize: 'Standard_DS2_v2'
-    adminPassword: vmpassword
     dataDisks: [
       {
         diskSizeGB: 128
         managedDisk: {
-          storageAccountType: 'Premium_LRS'
+          storageAccountType: 'Standard_LRS'
           diskEncryptionSet: {
-            id:  diskEncryptionSet.id
+            id: diskEncryptionSet.id
           }
         }
       }
@@ -118,12 +117,7 @@ module publicIpAddress 'br/public:avm/res/network/public-ip-address:0.2.2' = {
   }
 }
 
-output resourceId string = resourceId('Microsoft.Network/publicIPAddresses', 'bastionhostdbr1-pip')
-
 module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
-  dependsOn: [
-    publicIpAddress
-  ]
   name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
   params: {
     name: 'bastionhostdbr1'
