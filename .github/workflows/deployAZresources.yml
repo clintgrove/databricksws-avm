@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       paramRG:
-        description: 'Parameter for resource group'
+        description: 'Parameter for resource group. Note: the environment will be appended to the end of the resource group name'
         required: false
         default: 'dbr-private-rg-'
       newOrExistingVNET: 
