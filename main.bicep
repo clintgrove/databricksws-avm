@@ -12,23 +12,23 @@ var addressPrefix = '${vnetAddressPrefixParam}.0.0/16'
 ])
 param vnetNewOrExisting string = 'existing'
 
-param vnetName string = 'dwwaf-vnet'
+param vnetName string = 'bricks-vnet'
 @description('Resource ID of the existing VNet')
-param existingVnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/dwwaf-vnet'
+param existingVnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet'
 @description('Name of the existing private subnet')
 param existingPrivateSubnetName string = 'private-subnet'
 @description('Name of the existing public subnet')
 param existingPublicSubnetName string = 'public-subnet'
 @description('Resource ID of the existing default subnet')
-param existingDefaultSubnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/dwwaf-vnet/subnets/defaultSubnet'
+param existingDefaultSubnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet/subnets/defaultSubnet'
 
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
-  name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-nsg'
+  name: '${uniqueString(deployment().name, 'uksouth')}-bricks-nsg'
   params: {
-    name: 'dwwaf-nsg'
+    name: 'bricks-nsg'
     location: 'uksouth'
     securityRules: [
       {
@@ -148,7 +148,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
 }
 
 module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOrExisting == 'new') {
-  name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-vnet'
+  name: '${uniqueString(deployment().name, 'uksouth')}-bricks-vnet'
   params: {
     name: vnetName
     location: 'uksouth'
@@ -195,7 +195,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
 var vnetResourceId = vnetNewOrExisting == 'new' ? vnetwork.outputs.resourceId : existingVnetResourceId
 var privateSubnetName = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetNames[0] : existingPrivateSubnetName
 var publicSubnetName = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetNames[1] : existingPublicSubnetName
-var subnetName2 = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetResourceIds[2] : existingDefaultSubnetResourceId
+var vnetSubnetId2 = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetResourceIds[2] : existingDefaultSubnetResourceId
 
 module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-databricksworkspace'
@@ -226,7 +226,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
           ]
         }
         service: 'databricks_ui_api'
-        subnetResourceId: subnetName2 //vnetwork.outputs.subnetResourceIds[2]
+        subnetResourceId: vnetSubnetId2 //vnetwork.outputs.subnetResourceIds[2]
         tags: {
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
@@ -255,7 +255,7 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
   params: {
     name: privateEndpointNameBrowserAuth
     location: 'uksouth'
-    subnetResourceId: subnetName2
+    subnetResourceId: vnetSubnetId2
     privateDnsZoneGroupName: 'config2'
     privateDnsZoneResourceIds: [
       privateDnsZone.outputs.resourceId
