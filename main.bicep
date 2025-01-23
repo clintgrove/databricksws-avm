@@ -53,8 +53,15 @@ param existingPublicSubnetName string = 'public-subnet'
 
 var defaultSubnetName = 'default'
 
-// Find the default subnet by name
-var existingDefaultSubnetResourceId = first(existingVnet.properties.subnets[?subnet => subnet.name == defaultSubnetName]).id
+// Extract the array of subnets
+var subnets = existingVnet.properties.subnets
+
+// Filter the subnets by name
+var matchingSubnets = subnets[?subnet => subnet.name == defaultSubnetName]
+
+// Get the ID of the first matching subnet
+var existingDefaultSubnetResourceId = length(matchingSubnets) > 0 ? first(matchingSubnets).id : ''
+
 
 
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
