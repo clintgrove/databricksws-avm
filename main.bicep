@@ -137,8 +137,6 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
     ]
   }
 }
-
-
 module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOrExisting == 'new') {
   name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-vnet'
   params: {
@@ -221,8 +219,6 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
     ]
   }
 }
-
-
 module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
   params: {
@@ -236,7 +232,6 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
     ]
   }
 }
-
 module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
   params: {

@@ -10,6 +10,13 @@ on:
         description: 'Parameter for new or existing VNET'
         required: true
         default: existing
+      environment:
+        description: 'Select environment'
+        required: true
+        type: choice
+        options:
+          - DEV
+          - PROD
 
 env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
@@ -38,7 +45,7 @@ jobs:
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./main.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment | lower }}100'
           failOnStdErr: false
 
   deploy-vm:
