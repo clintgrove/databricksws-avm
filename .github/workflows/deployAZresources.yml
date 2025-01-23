@@ -45,7 +45,7 @@ jobs:
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}${{ github.event.inputs.environment}} 
           template: ./main.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}100'
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}1'
           failOnStdErr: false
 
   deploy-vm:

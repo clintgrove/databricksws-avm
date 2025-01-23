@@ -1,5 +1,5 @@
 @description('The name of the workspace to create.')
-param workspaceName string = 'dbr004'
+param workspaceName string
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
 
@@ -197,7 +197,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
     requiredNsgRules: 'NoAzureDatabricksRules'
     requireInfrastructureEncryption: true
     skuName: 'premium'
-    storageAccountName: '${workspaceName}${uniqueString(resourceGroup().id)}stg'
+    storageAccountName: '${workspaceName}take(${uniqueString(resourceGroup().id)},10)stg'
     storageAccountSkuName: 'Standard_ZRS'
     vnetAddressPrefix: vnetAddressPrefixParam
     privateEndpoints: [
