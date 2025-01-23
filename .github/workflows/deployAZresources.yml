@@ -5,7 +5,7 @@ on:
       paramRG:
         description: 'Parameter for resource group'
         required: false
-        default: 'dbr-private-rg-1'
+        default: 'dbr-private-rg-'
       newOrExistingVNET: 
         description: 'Parameter for new or existing VNET'
         required: true
@@ -15,8 +15,8 @@ on:
         required: true
         type: choice
         options:
-          - DEV
-          - PROD
+          - dev
+          - prod
 
 env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
@@ -38,14 +38,14 @@ jobs:
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
       - name: CreateRG
-        run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
+        run: az group create --name  ${{ github.event.inputs.paramRG }}${{ github.event.inputs.environment}} --location 'uksouth'
 
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./main.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment | lower }}100'
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}100'
           failOnStdErr: false
 
   deploy-vm:
