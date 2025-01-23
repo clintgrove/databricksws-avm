@@ -1,7 +1,7 @@
 @description('The name of the workspace to create.')
 param workspaceName string
 @description('vnet prefix address')
-param vnetAddressPrefixParam string = '10.101' 
+param vnetAddressPrefixParam string = '10.101'
 
 var addressPrefix = '${vnetAddressPrefixParam}.0.0/16'
 
@@ -19,8 +19,8 @@ param existingVnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01
 param existingPrivateSubnetName string = 'private-subnet'
 @description('Name of the existing public subnet')
 param existingPublicSubnetName string = 'public-subnet'
-@description('Name of the existing default subnet')
-param existingDefaultSubnetName string = 'defaultSubnet'
+@description('Resource ID of the existing default subnet')
+param existingDefaultSubnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/dwwaf-vnet/subnets/defaultSubnet'
 
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
@@ -146,6 +146,7 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
     ]
   }
 }
+
 module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOrExisting == 'new') {
   name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-vnet'
   params: {
@@ -181,7 +182,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
       }
       {
         name: 'defaultSubnet'
-        addressPrefix: cidrSubnet(addressPrefix, 20, 0) 
+        addressPrefix: cidrSubnet(addressPrefix, 20, 0)
       }
       {
         name: 'AzureBastionSubnet'
@@ -194,7 +195,8 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
 var vnetResourceId = vnetNewOrExisting == 'new' ? vnetwork.outputs.resourceId : existingVnetResourceId
 var privateSubnetName = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetNames[0] : existingPrivateSubnetName
 var publicSubnetName = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetNames[1] : existingPublicSubnetName
-var subnetName2 = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetResourceIds[2] : existingDefaultSubnetName
+var subnetName2 = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetResourceIds[2] : existingDefaultSubnetResourceId
+
 module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-databricksworkspace'
   params: {
@@ -233,6 +235,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
     ]
   }
 }
+
 module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
   params: {
@@ -246,12 +249,13 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
     ]
   }
 }
+
 module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
   params: {
     name: privateEndpointNameBrowserAuth
     location: 'uksouth'
-    subnetResourceId: vnetwork.outputs.subnetResourceIds[2]
+    subnetResourceId: subnetName2
     privateDnsZoneGroupName: 'config2'
     privateDnsZoneResourceIds: [
       privateDnsZone.outputs.resourceId
