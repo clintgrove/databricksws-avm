@@ -76,7 +76,7 @@ module virtualMachine 'br/public:avm/res/compute/virtual-machine:0.2.1' = {
         ipConfigurations: [
           {
             name: 'ipconfig01'
-            subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'defaultSubnet')
+            subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', 'bricks-vnet', 'defaultSubnet')
           }
         ]
         nicSuffix: '-nic-01'
@@ -121,7 +121,7 @@ module bastionHost 'br/public:avm/res/network/bastion-host:0.1.1' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-bastion-host'
   params: {
     name: 'bastionhostdbr1'
-    vNetId: resourceId('Microsoft.Network/virtualNetworks', 'dwwaf-vnet')
+    vNetId: resourceId('Microsoft.Network/virtualNetworks', 'bricks-vnet')
     location: 'uksouth'
     bastionSubnetPublicIpResourceId: publicIpAddress.outputs.resourceId
   }

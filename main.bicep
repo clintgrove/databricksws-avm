@@ -13,14 +13,44 @@ var addressPrefix = '${vnetAddressPrefixParam}.0.0/16'
 param vnetNewOrExisting string = 'existing'
 
 param vnetName string = 'bricks-vnet'
+// @description('Resource ID of the existing VNet')
+// param existingVnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet'
+// @description('Name of the existing private subnet')
+// param existingPrivateSubnetName string = 'private-subnet'
+// @description('Name of the existing public subnet')
+// param existingPublicSubnetName string = 'public-subnet'
+// @description('Resource ID of the existing default subnet')
+// param existingDefaultSubnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet/subnets/defaultSubnet'
+
+
+@description('Resource group name where the existing VNet is located')
+param existingVnetResourceGroupName string
+
+resource existingVnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
+  name: vnetName
+  scope: resourceGroup(existingVnetResourceGroupName)
+}
+
 @description('Resource ID of the existing VNet')
-param existingVnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet'
+var existingVnetResourceId = existingVnet.id
 @description('Name of the existing private subnet')
 param existingPrivateSubnetName string = 'private-subnet'
 @description('Name of the existing public subnet')
 param existingPublicSubnetName string = 'public-subnet'
+
+// resource existingPrivateSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
+//   name: existingPrivateSubnetName
+//   parent: existingVnet
+// }
+
+// resource existingPublicSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
+//   name: existingPublicSubnetName
+//   parent: existingVnet
+// }
+
 @description('Resource ID of the existing default subnet')
-param existingDefaultSubnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet/subnets/defaultSubnet'
+var existingDefaultSubnetResourceId = existingVnet.properties.subnets[2].id
+
 
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'

@@ -114,7 +114,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.6.0' = {
           resourceId('Microsoft.Network/privateDnsZones', privateDnsZoneName)
         ]
         service: 'dfs'
-        subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'dwwaf-vnet', 'defaultSubnet')
+        subnetResourceId:  resourceId('Microsoft.Network/virtualNetworks/subnets', 'bricks-vnet', 'defaultSubnet')
         tags: {
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
