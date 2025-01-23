@@ -43,7 +43,7 @@ jobs:
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: ${{ github.event.inputs.paramRG }}
+          resourceGroupName: ${{ github.event.inputs.paramRG }}${{ github.event.inputs.environment}} 
           template: ./main.bicep
           parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}100'
           failOnStdErr: false
