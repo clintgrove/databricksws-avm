@@ -74,7 +74,7 @@ jobs:
       - name: VM Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: ${{ github.event.inputs.paramRG }}
+          resourceGroupName: ${{ github.event.inputs.paramRG }}dev
           template: ./vm.bicep
           parameters: 'vmpassword=${{ steps.get-secret.outputs.vm_password }}'
           failOnStdErr: false
