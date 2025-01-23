@@ -1,5 +1,5 @@
 @description('The name of the workspace to create.')
-param workspaceName string = 'dbr004'
+param workspaceName string = 'db'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
 
