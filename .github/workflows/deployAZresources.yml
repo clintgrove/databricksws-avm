@@ -103,6 +103,6 @@ jobs:
       - name: Storage Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: ${{ github.event.inputs.paramRG }}
+          resourceGroupName: ${{ github.event.inputs.paramRG }}${{ github.event.inputs.environment}}
           template: ./storage.bicep
           failOnStdErr: false
