@@ -48,19 +48,19 @@ param existingPublicSubnetName string = 'public-subnet'
 //   parent: existingVnet
 // }
 
-//@description('Resource ID of the existing default subnet')
-//var existingDefaultSubnetResourceId = existingVnet.properties.subnets[0].id
+@description('Resource ID of the existing default subnet')
+var existingDefaultSubnetResourceId = existingVnet.properties.subnets[0].id
 
-var defaultSubnetName = 'default'
+// var defaultSubnetName = 'default'
 
-// Extract the array of subnets
-var subnets = existingVnet.properties.subnets
+// // Extract the array of subnets
+// var subnets = existingVnet.properties.subnets
 
-// Filter the subnets by name
-var matchingSubnets = subnets[?subnet => subnet.name == defaultSubnetName]
+// // Filter the subnets by name
+// var matchingSubnets = subnets[?subnet => subnet.name == defaultSubnetName]
 
-// Get the ID of the first matching subnet
-var existingDefaultSubnetResourceId = length(matchingSubnets) > 0 ? first(matchingSubnets).id : ''
+// // Get the ID of the first matching subnet
+// var existingDefaultSubnetResourceId = length(matchingSubnets) > 0 ? first(matchingSubnets).id : ''
 
 
 
