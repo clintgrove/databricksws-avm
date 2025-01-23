@@ -10,6 +10,10 @@ on:
         description: 'Parameter for new or existing VNET'
         required: true
         default: existing
+      useVnetInThisResourceGroup:
+        description: 'Parameter for using VNET that already exists'
+        required: true
+        default: dbr-private-rg-dev  
       environment:
         description: 'Select environment'
         required: true
@@ -45,7 +49,7 @@ jobs:
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}${{ github.event.inputs.environment}} 
           template: ./main.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}1'
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}1 existingVnetResourceGroupName=${{ github.event.inputs.useVnetInThisResourceGroup }}'
           failOnStdErr: false
 
   deploy-vm:
