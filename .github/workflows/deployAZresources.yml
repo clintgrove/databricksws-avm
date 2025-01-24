@@ -18,35 +18,35 @@ env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
 
 jobs:
-  deploy-network:
-    runs-on: ubuntu-latest
+  # deploy-network:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@main
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@main
 
-      - name: Azure Login
-        uses: Azure/login@v2.2.0
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #     - name: Azure Login
+  #       uses: Azure/login@v2.2.0
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Set Azure subscription context
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+  #     - name: Set Azure subscription context
+  #       run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
-      - name: CreateRG
-        run: az group create --name 'dbricks-networking' --location 'uksouth'
+  #     - name: CreateRG
+  #       run: az group create --name 'dbricks-networking' --location 'uksouth'
 
-      - name: Deploy the virtual network
-        uses: azure/arm-deploy@v1
-        with:
-          resourceGroupName: 'dbricks-networking'
-          template: ./networking.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
-          failOnStdErr: false
+  #     - name: Deploy the virtual network
+  #       uses: azure/arm-deploy@v1
+  #       with:
+  #         resourceGroupName: 'dbricks-networking'
+  #         template: ./networking.bicep
+  #         parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
+  #         failOnStdErr: false
 
   deploy-databricks:
     runs-on: ubuntu-latest
-    needs: deploy-network
+    #needs: deploy-network
 
     steps:
       - name: Checkout code
@@ -75,11 +75,11 @@ jobs:
             SUBNET_NAME_1=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetsubName1.value -o tsv)
             SUBNET_ID2=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetSub2.value -o tsv)
             PRIVATEDNS_ZONE_ID_OUTPUT=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.privateDnsZoneId.value -o tsv)
-            echo "vnet_id=$VNET_ID" >> $GITHUB_ENV
-            echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_ENV
-            echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_ENV
-            echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_ENV
-            echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_ENV
+            echo "vnet_id=$VNET_ID" >> "$GITHUB_ENV"
+            echo "subnet_name_0=$SUBNET_NAME_0" >> "$GITHUB_ENV"
+            echo "subnet_name_1=$SUBNET_NAME_1" >> "$GITHUB_ENV"
+            echo "subnet_id2=$SUBNET_ID2" >> "$GITHUB_ENV"
+            echo "privateDnsZoneIdoutput=$PRIVATEDNS_ZONE_ID_OUTPUT" >> "$GITHUB_ENV"
             echo "Captured VNet and Subnet details"
             echo "vnet_id=$VNET_ID"
             echo "subnet_name_0=$SUBNET_NAME_0"
