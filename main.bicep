@@ -2,6 +2,8 @@
 param workspaceName string = 'db'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
+@description('The name of the resource group to deploy the workspace to.')
+param vNetId string
 
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
@@ -15,7 +17,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
     name: workspaceName
     customPrivateSubnetName: networking.outputs.vnetsubName0
     customPublicSubnetName: networking.outputs.vnetsubName1
-    customVirtualNetworkResourceId: networking.outputs.vnetId
+    customVirtualNetworkResourceId: vNetId  //networking.outputs.vnetId
     disablePublicIp: true
     location: 'uksouth'
     publicIpName: 'nat-gw-public-ip'
