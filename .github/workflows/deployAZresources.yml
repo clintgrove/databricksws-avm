@@ -79,11 +79,11 @@ jobs:
           PRIVATEDNS_ZONE_ID_OUTPUT=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.privateDnsZoneId.value -o tsv)
 
           # Persist variables
-          echo "vnet_id=$VNET_ID" >> $GITHUB_OUTPUT
-          echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_OUTPUT
-          echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_OUTPUT
-          echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_OUTPUT
-          echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_OUTPUT
+          echo "vnet_id=$VNET_ID" >> $GITHUB_ENV
+          echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_ENV
+          echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_ENV
+          echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_ENV
+          echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_ENV
 
           echo "Captured Networking Outputs:"
           echo "vnet_id=$VNET_ID"
@@ -104,9 +104,9 @@ jobs:
           template: ./main.bicep
           parameters: |
             workspaceName=${{ github.event.inputs.dbricksWorkspaceName }}
-            vnetId="${{ steps.capture-outputs.outputs.vnet_id }}"
-            subnetName0="${{ steps.capture-outputs.outputs.subnet_name_0 }}"
-            subnetName1="${{ steps.capture-outputs.outputs.subnet_name_1 }}"
+            vnetId="/subscriptions/***/resourceGroups/dbricks-networking/providers/Microsoft.Network/virtualNetworks/dwwaf-vnet"
+            subnetName0="re"
+            subnetName1="$re"
             subnetId2="${{ steps.capture-outputs.outputs.subnet_id2 }}"
             privateDnsZoneId="${{ steps.capture-outputs.outputs.privateDnsZoneId }}"
           failOnStdErr: false
