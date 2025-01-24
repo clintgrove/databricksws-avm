@@ -248,8 +248,11 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
   }
 }
 
-module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
- name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
+@description('Resource ID of an existing private DNS zone, if available.')
+param existingPrivateDnsZoneId string = ''
+
+module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = if (empty(existingPrivateDnsZoneId)) {
+  name: '${uniqueString(deployment().name, 'uksouth')}-pvdnszone'
   params: {
     name: privateDnsZoneName
     location: 'global'
@@ -262,6 +265,8 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = {
   }
 }
 
+var privateDnsZoneResourceId = empty(existingPrivateDnsZoneId) ? privateDnsZone.outputs.resourceId : existingPrivateDnsZoneId
+
 module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0.3.3' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-browserauth-pe'
   params: {
@@ -270,7 +275,7 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
     subnetResourceId: vnetSubnetId2
     privateDnsZoneGroupName: 'config2'
     privateDnsZoneResourceIds: [
-      privateDnsZone.outputs.resourceId
+      privateDnsZoneResourceId
     ]
     privateLinkServiceConnections: [
       {
