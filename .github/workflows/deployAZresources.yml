@@ -13,6 +13,9 @@ on:
       useVnetInThisResourceGroup:
         description: 'Parameter for using VNET that already exists'
         default: dbr-private-rg-dev  
+      useExistingPrivateDnsZone:
+        description: 'Parameter for using existing Private DNS Zone'
+        default: '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/privateDnsZones/privatelink.azuredatabricks.net'  
       environment:
         description: 'Select environment'
         required: true
@@ -48,7 +51,7 @@ jobs:
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}${{ github.event.inputs.environment}} 
           template: ./main.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}1 existingVnetResourceGroupName=${{ github.event.inputs.useVnetInThisResourceGroup }}'
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} workspaceName=dbr${{ github.event.inputs.environment}}1 existingVnetResourceGroupName=${{ github.event.inputs.useVnetInThisResourceGroup }} existingPrivateDnsZoneId=${{ github.event.inputs.useExistingPrivateDnsZone }}'
           failOnStdErr: false
 
   deploy-vm:
