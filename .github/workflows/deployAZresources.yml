@@ -81,6 +81,11 @@ jobs:
           echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_ENV
           echo "privateDnsZoneIdoutput=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_ENV
           echo "Captured VNet and Subnet details"
+          echo "vnet_id=$VNET_ID"
+          echo "subnet_name_0=$SUBNET_NAME_0"
+          echo "subnet_name_1=$SUBNET_NAME_1"
+          echo "subnet_id2=$SUBNET_ID2"
+          echo "privateDnsZoneIdoutput=$PRIVATEDNS_ZONE_ID_OUTPUT"
 
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
