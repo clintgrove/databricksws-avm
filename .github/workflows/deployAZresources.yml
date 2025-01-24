@@ -73,11 +73,6 @@ jobs:
           echo "subnet_id2=$SUBNET_ID2"
           echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT"
 
-      - name: check envs
-        run: |
-            echo "${{ env.vnet_id }}"
-            echo "${{ env.subnet_name_0 }}"
-
   deploy-databricks:
     runs-on: ubuntu-latest
     needs: deploy-network
@@ -96,6 +91,11 @@ jobs:
 
       - name: CreateRG
         run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
+      
+      - name: check envs
+        run: |
+            echo "${{ env.vnet_id }}"
+            echo "${{ env.subnet_name_0 }}"
 
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
