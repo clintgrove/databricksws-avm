@@ -49,6 +49,25 @@ jobs:
           parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
           failOnStdErr: false
 
+  deploy-databricks:
+    runs-on: ubuntu-latest
+    needs: deploy-network
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Set Azure subscription context
+        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+
+      - name: CreateRG
+        run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
+      
       - name: Capture Networking Outputs
         id: capture-outputs
         run: |
@@ -72,26 +91,7 @@ jobs:
           echo "subnet_name_1=$SUBNET_NAME_1"
           echo "subnet_id2=$SUBNET_ID2"
           echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT"
-
-  deploy-databricks:
-    runs-on: ubuntu-latest
-    needs: deploy-network
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@main
-
-      - name: Azure Login
-        uses: Azure/login@v2.2.0
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
           
-      - name: Set Azure subscription context
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
-
-      - name: CreateRG
-        run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
-      
       - name: check envs
         run: |
             echo "${{ env.vnet_id }}"
