@@ -46,6 +46,7 @@ jobs:
 
   deploy-databricks:
     runs-on: ubuntu-latest
+    needs: deploy-network
 
     steps:
       - name: Checkout code
