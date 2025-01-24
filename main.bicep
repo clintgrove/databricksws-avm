@@ -7,7 +7,7 @@ param vNetId string
 param subnetName0 string
 param subnetName1 string
 param subnetId2 string
-param privateDnsZoneIdoutput string
+param privateDnsZoneId string
 
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
@@ -39,7 +39,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
         privateDnsZoneGroup: {
           privateDnsZoneGroupConfigs: [
             {
-              privateDnsZoneResourceId: privateDnsZoneIdoutput
+              privateDnsZoneResourceId: privateDnsZoneId
             }
           ]
         }

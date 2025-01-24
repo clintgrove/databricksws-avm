@@ -68,25 +68,25 @@ jobs:
           VNET_ID=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetId.value -o tsv)
           echo "vnet_id=$VNET_ID" >> "$GITHUB_ENV"
       
-      - name: Capture Networking Outputs
-        run: |
-          VNET_ID=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetId.value -o tsv)
-          SUBNET_NAME_0=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetsubName0.value -o tsv)
-          SUBNET_NAME_1=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetsubName1.value -o tsv)
-          SUBNET_ID2=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetSub2.value -o tsv)
-          PRIVATEDNS_ZONE_ID_OUTPUT=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.privateDnsZoneId.value -o tsv)
-          echo "vnet_id=$VNET_ID" >> "$GITHUB_ENV"
-          echo "subnet_name_0=$SUBNET_NAME_0" >> "$GITHUB_ENV"
-          echo "subnet_name_1=$SUBNET_NAME_1" >> "$GITHUB_ENV"
-          echo "subnet_id2=$SUBNET_ID2" >> "$GITHUB_ENV"
-          echo "privateDnsZoneIdoutput=$PRIVATEDNS_ZONE_ID_OUTPUT" >> "$GITHUB_ENV"
-          echo "Captured VNet and Subnet details"
-          echo "vnet_id=$VNET_ID"
-          echo "subnet_name_0=$SUBNET_NAME_0"
-          echo "subnet_name_1=$SUBNET_NAME_1"
-          echo "subnet_id2=$SUBNET_ID2"
-          echo "privateDnsZoneIdoutput=$PRIVATEDNS_ZONE_ID_OUTPUT"
-
+          - name: Capture Networking Outputs
+          run: |
+            VNET_ID=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetId.value -o tsv)
+            SUBNET_NAME_0=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetsubName0.value -o tsv)
+            SUBNET_NAME_1=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetsubName1.value -o tsv)
+            SUBNET_ID2=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetSub2.value -o tsv)
+            PRIVATEDNS_ZONE_ID_OUTPUT=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.privateDnsZoneId.value -o tsv)
+            echo "vnet_id=$VNET_ID" >> $GITHUB_ENV
+            echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_ENV
+            echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_ENV
+            echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_ENV
+            echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_ENV
+            echo "Captured VNet and Subnet details"
+            echo "vnet_id=$VNET_ID"
+            echo "subnet_name_0=$SUBNET_NAME_0"
+            echo "subnet_name_1=$SUBNET_NAME_1"
+            echo "subnet_id2=$SUBNET_ID2"
+            echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT"
+        
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
@@ -94,12 +94,13 @@ jobs:
           template: ./main.bicep
           parameters: |
             workspaceName=${{ github.event.inputs.dbricksWorkspaceName }}
-            vNetId=$VNET_ID
-            subnetName0=$SUBNET_NAME_0
-            subnetName1=$SUBNET_NAME_1
-            subnetId2=$SUBNET_ID2
-            privateDnsZoneIdoutput=$PRIVATEDNS_ZONE_ID_OUTPUT
+            vnetId=${{ env.vnet_id }}
+            subnetName0=${{ env.subnet_name_0 }}
+            subnetName1=${{ env.subnet_name_1 }}
+            subnetId2=${{ env.subnet_id2 }}
+            privateDnsZoneId=${{ env.privateDnsZoneId }}
           failOnStdErr: false
+        
 
   deploy-vm:
     runs-on: ubuntu-latest
