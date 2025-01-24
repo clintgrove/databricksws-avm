@@ -91,7 +91,7 @@ jobs:
           echo "subnet_name_1=$SUBNET_NAME_1"
           echo "subnet_id2=$SUBNET_ID2"
           echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT"
-          
+
       - name: check envs
         run: |
             echo "${{ env.vnet_id }}"
@@ -104,11 +104,11 @@ jobs:
           template: ./main.bicep
           parameters: |
             workspaceName=${{ github.event.inputs.dbricksWorkspaceName }}
-            vnetId=${{ env.vnet_id }}
-            subnetName0=${{ env.subnet_name_0 }}
-            subnetName1=${{ env.subnet_name_1 }}
-            subnetId2=${{ env.subnet_id2 }}
-            privateDnsZoneId=${{ env.privateDnsZoneId }}
+            vnetId="${{ env.vnet_id }}"
+            subnetName0="${{ env.subnet_name_0 }}"
+            subnetName1="${{ env.subnet_name_1 }}"
+            subnetId2="${{ env.subnet_id2 }}"
+            privateDnsZoneId="${{ env.privateDnsZoneId }}"
           failOnStdErr: false
         
 
