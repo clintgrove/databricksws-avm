@@ -79,11 +79,11 @@ jobs:
           PRIVATEDNS_ZONE_ID_OUTPUT=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.privateDnsZoneId.value -o tsv)
 
           # Persist variables
-          echo "vnet_id=$VNET_ID" >> $GITHUB_ENV
-          echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_ENV
-          echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_ENV
-          echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_ENV
-          echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_ENV
+          echo "vnet_id=$VNET_ID" >> $GITHUB_OUTPUT
+          echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_OUTPUT
+          echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_OUTPUT
+          echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_OUTPUT
+          echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_OUTPUT
 
           echo "Captured Networking Outputs:"
           echo "vnet_id=$VNET_ID"
@@ -95,7 +95,7 @@ jobs:
       - name: check envs
         run: |
             echo "${{ env.vnet_id }}"
-            echo "${{ env.subnet_name_0 }}"
+            echo "${{ steps.capture-outputs.outputs.vnet_id }}"
 
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
