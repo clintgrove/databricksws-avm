@@ -18,9 +18,9 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-databricksworkspace'
   params: {
     name: workspaceName
-    customPrivateSubnetName: networking.outputs.vnetsubName0
-    customPublicSubnetName: networking.outputs.vnetsubName1
-    customVirtualNetworkResourceId: vNetId  //networking.outputs.vnetId
+    customPrivateSubnetName: subnetName0
+    customPublicSubnetName: subnetName1
+    customVirtualNetworkResourceId: vNetId
     disablePublicIp: true
     location: 'uksouth'
     publicIpName: 'nat-gw-public-ip'
