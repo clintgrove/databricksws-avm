@@ -6,7 +6,8 @@ param vnetAddressPrefixParam string = '10.101'
 param vNetId string
 param subnetName0 string
 param subnetName1 string
-param subnetIds string
+param subnetId2 string
+param privateDnsZoneIdoutput string
 
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
@@ -38,12 +39,12 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
         privateDnsZoneGroup: {
           privateDnsZoneGroupConfigs: [
             {
-              privateDnsZoneResourceId: networking.outputs.privateDnsZoneId
+              privateDnsZoneResourceId: privateDnsZoneIdoutput
             }
           ]
         }
         service: 'databricks_ui_api'
-        subnetResourceId: networking.outputs.vnetSub2
+        subnetResourceId: subnetId2
         tags: {
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
@@ -58,7 +59,7 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
   params: {
     name: privateEndpointNameBrowserAuth
     location: 'uksouth'
-    subnetResourceId: networking.outputs.vnetSub2
+    subnetResourceId: subnetId2
     privateDnsZoneGroupName: 'config2'
     privateDnsZoneResourceIds: [
       networking.outputs.privateDnsZoneId
