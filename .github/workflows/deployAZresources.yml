@@ -34,12 +34,12 @@ jobs:
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
       - name: CreateRG
-        run: az group create --name 'databricks-networking' --location 'uksouth'
+        run: az group create --name 'dbricks-networking' --location 'uksouth'
 
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: 'databricks-networking'
+          resourceGroupName: 'dbricks-networking'
           template: ./networking.bicep
           parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
           failOnStdErr: false
@@ -100,7 +100,7 @@ jobs:
       - name: VM Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
-          resourceGroupName: ${{ github.event.inputs.paramRG }}
+          resourceGroupName: 'dbricks-vm'
           template: ./vm.bicep
           parameters: 'vmpassword=${{ steps.get-secret.outputs.vm_password }}'
           failOnStdErr: false
