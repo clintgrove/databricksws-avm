@@ -50,6 +50,7 @@ jobs:
           failOnStdErr: false
 
       - name: Capture Networking Outputs
+        id: capture-outputs
         run: |
           echo "Fetching deployment outputs..."
           VNET_ID=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetId.value -o tsv)

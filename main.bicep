@@ -3,7 +3,7 @@ param workspaceName string = 'db'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
 @description('The name of the resource group to deploy the workspace to.')
-param vNetId string
+param vnetId string
 param subnetName0 string
 param subnetName1 string
 param subnetId2 string
@@ -21,7 +21,7 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
     name: workspaceName
     customPrivateSubnetName: subnetName0
     customPublicSubnetName: subnetName1
-    customVirtualNetworkResourceId: vNetId
+    customVirtualNetworkResourceId: vnetId
     disablePublicIp: true
     location: 'uksouth'
     publicIpName: 'nat-gw-public-ip'
