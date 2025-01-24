@@ -65,7 +65,7 @@ jobs:
       
       - name: Capture Networking Outputs
         run: |
-          VNET_ID=$(az deployment group show --resource-group dbricks-networking --name vnetwork --query properties.outputs.vnetId.value -o tsv)
+          VNET_ID=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetId.value -o tsv)
           echo "vnet_id=$VNET_ID" >> $GITHUB_ENV
       
       - name: Capture Networking Outputs
@@ -78,7 +78,7 @@ jobs:
             echo "subnet_names=$SUBNET_NAMES" >> $GITHUB_ENV
             echo "subnet_ids=$SUBNET_IDS" >> $GITHUB_ENV
             echo "Captured VNet and Subnet details"
-            
+
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
