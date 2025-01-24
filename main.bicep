@@ -13,65 +13,33 @@ var addressPrefix = '${vnetAddressPrefixParam}.0.0/16'
 param vnetNewOrExisting string = 'existing'
 
 param vnetName string = 'bricks-vnet'
-// @description('Resource ID of the existing VNet')
-// param existingVnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet'
-// @description('Name of the existing private subnet')
-// param existingPrivateSubnetName string = 'private-subnet'
-// @description('Name of the existing public subnet')
-// param existingPublicSubnetName string = 'public-subnet'
-// @description('Resource ID of the existing default subnet')
-// param existingDefaultSubnetResourceId string = '/subscriptions/6d0a0c1f-6739-473b-962f-01f793ed5368/resourceGroups/dbr-private-rg-dev/providers/Microsoft.Network/virtualNetworks/bricks-vnet/subnets/defaultSubnet'
-
-
 @description('Resource group name where the existing VNet is located')
 param existingVnetResourceGroupName string
+@description('Resource ID of the existing NSG')
+param existingNsgResourceId string = ''
 
-resource existingVnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
+resource existingVnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing = if (vnetNewOrExisting == 'existing') {
   name: vnetName
   scope: resourceGroup(existingVnetResourceGroupName)
 }
 
 @description('Resource ID of the existing VNet')
-var existingVnetResourceId = existingVnet.id
+var existingVnetResourceId = vnetNewOrExisting == 'existing' ? existingVnet.id : ''
 @description('Name of the existing private subnet')
 param existingPrivateSubnetName string = 'private-subnet'
 @description('Name of the existing public subnet')
 param existingPublicSubnetName string = 'public-subnet'
 
-// resource existingPrivateSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
-//   name: existingPrivateSubnetName
-//   parent: existingVnet
-// }
-
-// resource existingPublicSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
-//   name: existingPublicSubnetName
-//   parent: existingVnet
-// }
-
 @description('Resource ID of the existing default subnet')
-var existingDefaultSubnetResourceId = existingVnet.properties.subnets[0].id
-
-// var defaultSubnetName = 'default'
-
-// // Extract the array of subnets
-// var subnets = existingVnet.properties.subnets
-
-// // Filter the subnets by name
-// var matchingSubnets = subnets[?subnet => subnet.name == defaultSubnetName]
-
-// // Get the ID of the first matching subnet
-// var existingDefaultSubnetResourceId = length(matchingSubnets) > 0 ? first(matchingSubnets).id : ''
-
-
+var existingDefaultSubnetResourceId = vnetNewOrExisting == 'existing' ? existingVnet.properties.subnets[0].id : ''
 
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
-module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
+resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = if (vnetNewOrExisting == 'new') {
   name: '${uniqueString(deployment().name, 'uksouth')}-bricks-nsg'
-  params: {
-    name: 'bricks-nsg'
-    location: 'uksouth'
+  location: 'uksouth'
+  properties: {
     securityRules: [
       {
         name: 'AllowBastionToVM'
@@ -189,6 +157,8 @@ module nsg 'br/public:avm/res/network/network-security-group:0.1.2' = {
   }
 }
 
+var nsgResourceId = vnetNewOrExisting == 'new' ? nsg.id : existingNsgResourceId
+
 module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOrExisting == 'new') {
   name: '${uniqueString(deployment().name, 'uksouth')}-bricks-vnet'
   params: {
@@ -199,7 +169,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
       {
         name: 'private-subnet'
         addressPrefix: cidrSubnet(addressPrefix, 20, 2) //privateSubnetCidr
-        networkSecurityGroupResourceId: nsg.outputs.resourceId
+        networkSecurityGroupResourceId: nsgResourceId
         delegations: [
             {
               name: 'databricks-del-private'
@@ -212,7 +182,7 @@ module vnetwork 'br/public:avm/res/network/virtual-network:0.1.1' = if(vnetNewOr
       {
         name: 'public-subnet'
         addressPrefix: cidrSubnet(addressPrefix, 20, 1) //publicSubnetCidr
-        networkSecurityGroupResourceId: nsg.outputs.resourceId
+        networkSecurityGroupResourceId: nsgResourceId
         delegations: [
             {
               name: 'databricks-del-public'
