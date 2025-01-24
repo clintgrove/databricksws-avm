@@ -1,11 +1,11 @@
-name: Deploy Bicep file
+name: Deploy to DEV
 on:
   workflow_dispatch:
     inputs:
       paramRG:
         description: 'Parameter for resource group'
         required: false
-        default: 'dbr-private-rg-1'
+        default: 'dbricks-dev'
       newOrExistingVNET: 
         description: 'Parameter for new or existing VNET'
         required: true
