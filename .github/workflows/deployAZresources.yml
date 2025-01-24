@@ -57,6 +57,9 @@ jobs:
       - name: Set Azure subscription context
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
+      - name: CreateRGforVM
+        run: az group create --name 'dbricks-vm' --location 'uksouth'
+
       - name: Get secret from Key Vault
         id: get-secret
         run: |
