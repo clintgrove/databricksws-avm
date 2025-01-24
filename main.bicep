@@ -4,6 +4,9 @@ param workspaceName string = 'db'
 param vnetAddressPrefixParam string = '10.101' 
 @description('The name of the resource group to deploy the workspace to.')
 param vNetId string
+param subnetName0 string
+param subnetName1 string
+param subnetIds string
 
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
