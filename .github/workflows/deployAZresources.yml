@@ -6,6 +6,9 @@ on:
         description: 'Parameter for resource group'
         required: false
         default: 'dbricks-dev'
+      dbricksWorkspaceName:
+        description: 'Parameter for Databricks workspace name'
+        required: true
       newOrExistingVNET: 
         description: 'Parameter for new or existing VNET'
         required: true
@@ -15,6 +18,32 @@ env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
 
 jobs:
+  deploy-network:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set Azure subscription context
+        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+
+      - name: CreateRG
+        run: az group create --name 'databricks-networking' --location 'uksouth'
+
+      - name: Databricks Deploy Bicep file
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: 'databricks-networking'
+          template: ./networking.bicep
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
+          failOnStdErr: false
+
   deploy-databricks:
     runs-on: ubuntu-latest
 
@@ -38,7 +67,7 @@ jobs:
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./main.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
+          parameters: 'workspaceName=${{ github.event.inputs.dbricksWorkspaceName }}'
           failOnStdErr: false
 
   deploy-vm:
