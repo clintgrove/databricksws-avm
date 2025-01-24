@@ -16,37 +16,42 @@ on:
 
 env:
   CI_KEY_VAULT_NAME: "${{ vars.CI_KEY_VAULT_NAME }}"
+  vnet_id: ""
+  subnet_name_0: ""
+  subnet_name_1: ""
+  subnet_id2: ""
+  privateDnsZoneId: ""
 
 jobs:
-  # deploy-network:
-  #   runs-on: ubuntu-latest
+  deploy-network:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@main
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
 
-  #     - name: Azure Login
-  #       uses: Azure/login@v2.2.0
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-  #     - name: Set Azure subscription context
-  #       run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
+      - name: Set Azure subscription context
+        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
-  #     - name: CreateRG
-  #       run: az group create --name 'dbricks-networking' --location 'uksouth'
+      - name: CreateRG
+        run: az group create --name 'dbricks-networking' --location 'uksouth'
 
-  #     - name: Deploy the virtual network
-  #       uses: azure/arm-deploy@v1
-  #       with:
-  #         resourceGroupName: 'dbricks-networking'
-  #         template: ./networking.bicep
-  #         parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
-  #         failOnStdErr: false
+      - name: Deploy the virtual network
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: 'dbricks-networking'
+          template: ./networking.bicep
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
+          failOnStdErr: false
 
   deploy-databricks:
     runs-on: ubuntu-latest
-    #needs: deploy-network
+    needs: deploy-network
 
     steps:
       - name: Checkout code
