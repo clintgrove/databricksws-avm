@@ -286,7 +286,7 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
   }
 }
 
-output vnetId string = vnetwork.outputs.resourceId
+output vnetId string = vnetResourceId
 output vnetSub0 string = vnetwork.outputs.subnetResourceIds[0]
 output vnetSub1 string = vnetwork.outputs.subnetResourceIds[1]
 output vnetSub2 string = vnetwork.outputs.subnetResourceIds[2]
