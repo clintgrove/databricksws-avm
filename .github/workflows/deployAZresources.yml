@@ -92,6 +92,10 @@ jobs:
       - name: CreateRG
         run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
       
+      - name: check envs
+        run: echo "${{ env.vnet_id }}"
+             echo "$subnet_name_0"
+
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
