@@ -2,26 +2,22 @@
 param workspaceName string = 'db'
 @description('vnet prefix address')
 param vnetAddressPrefixParam string = '10.101' 
-@description('The name of the resource group to deploy the workspace to.')
-param vnetId string
-param subnetName0 string
-param subnetName1 string
-param subnetId2 string
-param privateDnsZoneId string
 
 var privateEndpointNameBrowserAuth = '${workspaceName}-pvtEndpoint-browserAuth'
 
 module networking 'networking.bicep' = {
-  name: 'vnetwork'
+  name: 'ntwrk'
+  params: {
+  }
 }
 
 module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
   name: '${uniqueString(deployment().name, 'uksouth')}-databricksworkspace'
   params: {
     name: workspaceName
-    customPrivateSubnetName: subnetName0
-    customPublicSubnetName: subnetName1
-    customVirtualNetworkResourceId: vnetId
+    customPrivateSubnetName: networking.outputs.vnetsubName0
+    customPublicSubnetName:  networking.outputs.vnetsubName1
+    customVirtualNetworkResourceId: networking.outputs.vnetId
     disablePublicIp: true
     location: 'uksouth'
     publicIpName: 'nat-gw-public-ip'
@@ -39,12 +35,12 @@ module workspace 'br/public:avm/res/databricks/workspace:0.8.5' = {
         privateDnsZoneGroup: {
           privateDnsZoneGroupConfigs: [
             {
-              privateDnsZoneResourceId: privateDnsZoneId
+              privateDnsZoneResourceId: networking.outputs.privateDnsZoneId
             }
           ]
         }
         service: 'databricks_ui_api'
-        subnetResourceId: subnetId2
+        subnetResourceId: networking.outputs.defaultSubnetId
         tags: {
           Environment: 'Non-Prod'
           Role: 'DeploymentValidation'
@@ -59,7 +55,7 @@ module privateEndpoint_browserAuth 'br/public:avm/res/network/private-endpoint:0
   params: {
     name: privateEndpointNameBrowserAuth
     location: 'uksouth'
-    subnetResourceId: subnetId2
+    subnetResourceId: networking.outputs.defaultSubnetId
     privateDnsZoneGroupName: 'config2'
     privateDnsZoneResourceIds: [
       networking.outputs.privateDnsZoneId

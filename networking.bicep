@@ -8,6 +8,21 @@ param vnetName string = 'dwwaf-vnet'
 param vnetAddressPrefixParam string = '10.101' 
 var addressPrefix = '${vnetAddressPrefixParam}.0.0/16'
 var privateDnsZoneName = 'privatelink.azuredatabricks.net'
+// @description('Resource group name where the existing VNet is located')
+// param existingVnetResourceGroupName string
+@description('Resource ID of the existing NSG')
+param existingNsgResourceId string = ''
+@description('Resource ID of the existing VNet')
+param existingVnetResourceId string = ''
+@description('Resource ID of the existing private DNS zone')
+param existingPrivateDnsZoneId string = ''
+param existingsubName0 string = ''
+param existingsubName1 string = ''
+param existingsubName2 string = ''
+param existingSubNetID0 string = ''
+param existingSubNetID1 string = ''
+param existingSubNetID2 string = ''
+param existingNsgName string = ''
 
 module nsg 'br/public:avm/res/network/network-security-group:0.1.2'  = if(vnetNewOrExisting == 'new') {
   name: '${uniqueString(deployment().name, 'uksouth')}-dwwaf-nsg'
@@ -189,17 +204,14 @@ module privateDnsZone 'br/public:avm/res/network/private-dns-zone:0.2.3' = if(vn
      ]
    }
  }
- 
 
-
-output vnetId string = vnetwork.outputs.resourceId
-output vnetRG string = vnetwork.outputs.resourceGroupName
-output vnetsubName0 string = vnetwork.outputs.subnetNames[0]
-output vnetsubName1 string = vnetwork.outputs.subnetNames[1]
-output vnetsubName2 string = vnetwork.outputs.subnetNames[2]
-output vnetSub0 string = vnetwork.outputs.subnetResourceIds[0]
-output vnetSub1 string = vnetwork.outputs.subnetResourceIds[1]
-output vnetSub2 string = vnetwork.outputs.subnetResourceIds[2]
-output nsgId string = nsg.outputs.resourceId
-output ngsname string = nsg.outputs.name
-output privateDnsZoneId string = privateDnsZone.outputs.resourceId
+output vnetId string = vnetNewOrExisting == 'new' ? vnetwork.outputs.resourceId : existingVnetResourceId
+output nsgId string = vnetNewOrExisting == 'new' ? nsg.outputs.resourceId : existingNsgResourceId
+output privateDnsZoneId string = vnetNewOrExisting == 'new' ? privateDnsZone.outputs.resourceId : existingPrivateDnsZoneId
+output vnetsubName0 string = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetNames[0] : existingsubName0
+output vnetsubName1 string = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetNames[1] : existingsubName1
+output vnetsubName2 string = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetNames[2] : existingsubName2
+output vnetSub0 string = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetResourceIds[0] : existingSubNetID0
+output vnetSub1 string = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetResourceIds[1] : existingSubNetID1
+output defaultSubnetId string = vnetNewOrExisting == 'new' ? vnetwork.outputs.subnetResourceIds[2] : existingSubNetID2
+output ngsname string = vnetNewOrExisting == 'new' ? nsg.outputs.name : existingNsgName

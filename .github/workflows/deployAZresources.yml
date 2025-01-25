@@ -41,12 +41,29 @@ jobs:
       - name: CreateRG
         run: az group create --name 'dbricks-networking' --location 'uksouth'
 
+      - name: Capture Networking Outputs
+        id: capture-outputs
+        run: |
+          echo "Fetching deployment outputs..."
+          VNET_ID=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetId.value -o tsv)
+          SUBNET_NAME_0=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetSub0.value -o tsv)
+          SUBNET_NAME_1=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetsubName1.value -o tsv)
+          SUBNET_ID2=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetSub2.value -o tsv)
+          PRIVATEDNS_ZONE_ID_OUTPUT=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.privateDnsZoneId.value -o tsv)
+
+          # Persist variables
+          echo "vnet_id=$VNET_ID" >> $GITHUB_ENV
+          echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_ENV
+          echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_ENV
+          echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_ENV
+          echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_ENV
+
       - name: Deploy the virtual network
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: 'dbricks-networking'
           template: ./networking.bicep
-          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }}'
+          parameters: 'vnetNewOrExisting=${{ github.event.inputs.newOrExistingVNET }} existingVnetResourceId=${{ env.vnet_id}} existingsubName0=${{ env.subnet_name_0}} existingsubName1=${{ env.subnet_name_1}} existingSubNetID2=${{ env.subnet_id2}} existingPrivateDnsZoneId=${{ env.privateDnsZoneId}}'
           failOnStdErr: false
 
   deploy-databricks:
@@ -67,42 +84,13 @@ jobs:
 
       - name: CreateRG
         run: az group create --name  ${{ github.event.inputs.paramRG }} --location 'uksouth'
-      
-      - name: Capture Networking Outputs
-        id: capture-outputs
-        run: |
-          echo "Fetching deployment outputs..."
-          VNET_ID=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetId.value -o tsv)
-          SUBNET_NAME_0=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetSub0.value -o tsv)
-          SUBNET_NAME_1=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetsubName1.value -o tsv)
-          SUBNET_ID2=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.vnetSub2.value -o tsv)
-          PRIVATEDNS_ZONE_ID_OUTPUT=$(az deployment group show --resource-group dbricks-networking --name networking --query properties.outputs.privateDnsZoneId.value -o tsv)
-
-          # Persist variables
-          echo "vnet_id=$VNET_ID" >> $GITHUB_ENV
-          echo "subnet_name_0=$SUBNET_NAME_0" >> $GITHUB_ENV
-          echo "subnet_name_1=$SUBNET_NAME_1" >> $GITHUB_ENV
-          echo "subnet_id2=$SUBNET_ID2" >> $GITHUB_ENV
-          echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT" >> $GITHUB_ENV
-
-          echo "Captured Networking Outputs:"
-          echo "vnet_id=$VNET_ID"
-          echo "subnet_name_0=$SUBNET_NAME_0"
-          echo "subnet_name_1=$SUBNET_NAME_1"
-          echo "subnet_id2=$SUBNET_ID2"
-          echo "privateDnsZoneId=$PRIVATEDNS_ZONE_ID_OUTPUT"
-
-      - name: check envs
-        run: |
-            echo "${{ env.vnet_id }}"
-            echo "${{ steps.capture-outputs.outputs.vnet_id }}"
 
       - name: Databricks Deploy Bicep file
         uses: azure/arm-deploy@v1
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./main.bicep
-          parameters: 'workspaceName=${{ github.event.inputs.dbricksWorkspaceName }} vnetId=${{ env.vnet_id}} subnetName0=${{ env.subnet_name_0}} subnetName1=${{ env.subnet_name_1}} subnetId2=${{ env.subnet_id2}} privateDnsZoneId=${{ env.privateDnsZoneId}}'
+          parameters: 'workspaceName=${{ github.event.inputs.dbricksWorkspaceName }}'
           failOnStdErr: false
         
 
