@@ -9,6 +9,7 @@ on:
       dbricksWorkspaceName:
         description: 'Parameter for Databricks workspace name'
         required: true
+        default: 'dbr21'
       newOrExistingVNET: 
         description: 'Parameter for new or existing VNET'
         required: true
