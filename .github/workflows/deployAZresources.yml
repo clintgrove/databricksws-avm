@@ -102,7 +102,7 @@ jobs:
         with:
           resourceGroupName: ${{ github.event.inputs.paramRG }}
           template: ./main.bicep
-          parameters: 'workspaceName=${{ github.event.inputs.dbricksWorkspaceName }} vnetId=/subscriptions/454/resourceGroups/dbricks-networking/providers/Microsoft.Network/virtualNetworks/dwwaf-vnet subnetName0=re subnetName1=fgf subnetId2=fdsf privateDnsZoneId=reerw'
+          parameters: 'workspaceName=${{ github.event.inputs.dbricksWorkspaceName }} vnetId=${{ env.vnet_id}} subnetName0=${{ env.subnet_name_0}} subnetName1=${{ env.subnet_name_1}} subnetId2=${{ env.subnet_id2}} privateDnsZoneId=${{ env.privateDnsZoneId}}'
           failOnStdErr: false
         
 
